@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paramètres - Qwitter{% endblock %}
+
+{% block body %}
+    <div class="max-w-5xl mx-auto space-y-10">
+        
+        <!-- Header de la page -->
+        <header class="space-y-4">
+            <h1 class="text-3xl font-bold text-slate-800">Paramètres Généraux</h1>
+            
+            <!-- Navigation Tabulaire -->
+            <div class="flex gap-4 border-b border-gray-200 pb-1 mt-6">
+                <a href="{{ path('app_parametres', {tab: 'account'}) }}" class="pb-3 border-b-2 {{ onglet_actif == 'account' ? 'border-slate-800 text-slate-800 font-semibold' : 'border-transparent text-gray-400 hover:text-gray-600 font-medium' }} px-2 transition-colors">Mon Compte</a>
+                <a href="{{ path('app_parametres', {tab: 'privacy'}) }}" class="pb-3 border-b-2 {{ onglet_actif == 'privacy' ? 'border-slate-800 text-slate-800 font-semibold' : 'border-transparent text-gray-400 hover:text-gray-600 font-medium' }} px-2 transition-colors">Confidentialité</a>
+                <a href="{{ path('app_parametres', {tab: 'security'}) }}" class="pb-3 border-b-2 {{ onglet_actif == 'security' ? 'border-slate-800 text-slate-800 font-semibold' : 'border-transparent text-gray-400 hover:text-gray-600 font-medium' }} px-2 transition-colors">Sécurité</a>
+                <a href="{{ path('app_parametres', {tab: 'billing'}) }}" class="pb-3 border-b-2 {{ onglet_actif == 'billing' ? 'border-slate-800 text-slate-800 font-semibold' : 'border-transparent text-gray-400 hover:text-gray-600 font-medium' }} px-2 transition-colors">Facturation</a>
+            </div>
+        </header>
+
+        <!-- Contenu dynamique selon l'onglet -->
+        {% if onglet_actif == 'account' %}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+                {{ form_start(formulaire, {'attr': {'class': 'space-y-8'}}) }}
+
+                <!-- Section Avatar -->
+                <div class="flex items-center gap-6">
+                    <div class="relative group">
+                        <div class="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
+                            <span class="text-3xl">👤</span>
+                        </div>
+                        <label for="{{ formulaire.avatar.vars.id }}" class="absolute bottom-0 right-0 bg-slate-800 text-white p-2 rounded-full cursor-pointer hover:bg-slate-700 transition-colors shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                        </label>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Votre Photo</h3>
+                        <p class="text-sm text-gray-500 mb-2">Cette photo sera affichée sur votre profil.</p>
+                        <div class="hidden">
+                            {{ form_widget(formulaire.avatar) }}
+                        </div>
+                        {{ form_errors(formulaire.avatar) }}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Pseudo -->
+                    <div class="space-y-2">
+                        {{ form_label(formulaire.pseudo, null, {'label_attr': {'class': 'block text-sm font-semibold text-slate-700'}}) }}
+                        {{ form_widget(formulaire.pseudo, {'attr': {'class': 'w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 outline-none transition-all', 'placeholder': 'Votre pseudo'}}) }}
+                        {{ form_errors(formulaire.pseudo, {'attr': {'class': 'text-red-500 text-sm'}}) }}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="space-y-2">
+                        {{ form_label(formulaire.email, null, {'label_attr': {'class': 'block text-sm font-semibold text-slate-700'}}) }}
+                        {{ form_widget(formulaire.email, {'attr': {'class': 'w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 outline-none transition-all', 'placeholder': 'exemple@email.com'}}) }}
+                        {{ form_errors(formulaire.email, {'attr': {'class': 'text-red-500 text-sm'}}) }}
+                    </div>
+                </div>
+
+                <!-- Bio -->
+                <div class="space-y-2">
+                    {{ form_label(formulaire.bio, null, {'label_attr': {'class': 'block text-sm font-semibold text-slate-700'}}) }}
+                    {{ form_widget(formulaire.bio, {'attr': {'class': 'w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 outline-none transition-all resize-y', 'rows': '4', 'placeholder': 'Dites quelque chose sur vous...'}}) }}
+                    {{ form_errors(formulaire.bio, {'attr': {'class': 'text-red-500 text-sm'}}) }}
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-end gap-4 pt-4 border-t border-gray-100">
+                    <button type="button" class="px-6 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-medium transition-colors">Annuler</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-slate-800 text-white font-medium hover:bg-slate-900 shadow-lg shadow-slate-200 transition-all flex items-center gap-2">
+                        <span>Enregistrer les modifications</span>
+                    </button>
+                </div>
+
+                {{ form_end(formulaire) }}
+            </div>
+
+        {% elseif onglet_actif == 'privacy' %}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center">
+                <h3 class="text-lg font-medium text-slate-800">Paramètres de confidentialité</h3>
+                <p class="text-gray-500 mt-2">Gérez qui peut voir votre contenu et vous contacter.</p>
+            </div>
+
+        {% elseif onglet_actif == 'security' %}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center">
+                <h3 class="text-lg font-medium text-slate-800">Paramètres de sécurité</h3>
+                <p class="text-gray-500 mt-2">Modifiez votre mot de passe et sécurisez votre compte.</p>
+            </div>
+
+        {% elseif onglet_actif == 'billing' %}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center">
+                <h3 class="text-lg font-medium text-slate-800">Facturation</h3>
+                <p class="text-gray-500 mt-2">Gérez vos abonnements et moyens de paiement.</p>
+            </div>
+
+        {% else %}
+             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center">
+                <p class="text-gray-500">Onglet inconnu.</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
