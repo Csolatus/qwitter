@@ -8,9 +8,19 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+
+
+use App\Entity\Like;
+use App\Entity\Message;
+use App\Entity\Notification;
+
+
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -20,7 +30,7 @@ class User
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
 
     #[ORM\Column(length: 255)]
@@ -38,7 +48,10 @@ class User
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $avatar = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $fullName = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $google_id = null;
 
     #[ORM\Column]
@@ -46,6 +59,21 @@ class User
 
     #[ORM\Column(nullable: true)]
     private ?\DateTime $updated_at = null;
+
+    #[ORM\Column(options: ['default' => false])]
+    private ?bool $isPrivate = false;
+
+    #[ORM\Column(length: 20, options: ['default' => 'everyone'])]
+    private ?string $messagePrivacy = 'everyone'; // everyone, followers, nobody
+
+    #[ORM\Column(options: ['default' => true])]
+    private ?bool $isOnlineVisible = true;
+
+    #[ORM\Column(options: ['default' => true])]
+    private ?bool $isIndexed = true;
+
+    #[ORM\Column(options: ['default' => false])]
+    private ?bool $is2FAEnabled = false;
 
     /**
      * @var Collection<int, Post>
@@ -92,9 +120,23 @@ class User
         return $this;
     }
 
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
     public function getRoles(): array
     {
-        return $this->roles;
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
     public function setRoles(array $roles): static
@@ -114,6 +156,15 @@ class User
         $this->password = $password;
 
         return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 
     public function getPseudo(): ?string
@@ -164,6 +215,18 @@ class User
         return $this;
     }
 
+    public function getFullName(): ?string
+    {
+        return $this->fullName;
+    }
+
+    public function setFullName(?string $fullName): static
+    {
+        $this->fullName = $fullName;
+
+        return $this;
+    }
+
     public function getGoogleId(): ?string
     {
         return $this->google_id;
@@ -196,6 +259,66 @@ class User
     public function setUpdatedAt(?\DateTime $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function isPrivate(): ?bool
+    {
+        return $this->isPrivate;
+    }
+
+    public function setIsPrivate(bool $isPrivate): static
+    {
+        $this->isPrivate = $isPrivate;
+
+        return $this;
+    }
+
+    public function getMessagePrivacy(): ?string
+    {
+        return $this->messagePrivacy;
+    }
+
+    public function setMessagePrivacy(string $messagePrivacy): static
+    {
+        $this->messagePrivacy = $messagePrivacy;
+
+        return $this;
+    }
+
+    public function isOnlineVisible(): ?bool
+    {
+        return $this->isOnlineVisible;
+    }
+
+    public function setIsOnlineVisible(bool $isOnlineVisible): static
+    {
+        $this->isOnlineVisible = $isOnlineVisible;
+
+        return $this;
+    }
+
+    public function isIndexed(): ?bool
+    {
+        return $this->isIndexed;
+    }
+
+    public function setIsIndexed(bool $isIndexed): static
+    {
+        $this->isIndexed = $isIndexed;
+
+        return $this;
+    }
+
+    public function is2FAEnabled(): ?bool
+    {
+        return $this->is2FAEnabled;
+    }
+
+    public function setIs2FAEnabled(bool $is2FAEnabled): static
+    {
+        $this->is2FAEnabled = $is2FAEnabled;
 
         return $this;
     }

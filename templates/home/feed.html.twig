@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Feed{% endblock %}
+
+{% block body %}
+<div style="background-color: white; color: black; padding: 20px; text-align: center;">
+    <h1>Welcome to your Feed!</h1>
+    <p>You are logged in as {{ app.user.userIdentifier }}</p>
+    <a href="{{ path('app_logout') }}">Logout</a>
+</div>
+{% endblock %}
