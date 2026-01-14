@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ user.pseudo }} - Qwitter{% endblock %}
+
+{% block body %}
+    <div class="max-w-4xl mx-auto space-y-6">
+        
+        <!-- Carte de Profil -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <!-- Bannière (Placeholder pour l'instant) -->
+            <div class="h-48 bg-slate-800 w-full relative">
+                {# TODO: Ajouter image de bannière #}
+            </div>
+
+            <div class="px-8 pb-8">
+                <div class="flex justify-between items-end -mt-12 mb-6">
+                    <!-- Avatar -->
+                    <div class="relative">
+                        <div class="w-32 h-32 bg-white rounded-full p-1 shadow-lg">
+                            <div class="w-full h-full bg-slate-100 rounded-full flex items-center justify-center overflow-hidden">
+                                {% if user.avatar %}
+                                    <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="{{ user.pseudo }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    <span class="text-4xl">👤</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div>
+                        {% if is_me %}
+                            <a href="{{ path('app_parametres') }}" class="px-4 py-2 border border-gray-300 text-gray-700 font-semibold rounded-full hover:bg-gray-50 transition-colors">
+                                Éditer le profil
+                            </a>
+                        {% else %}
+                             {# TODO: Bouton Suivre #}
+                            <button class="px-6 py-2 bg-slate-800 text-white font-semibold rounded-full hover:bg-slate-900 transition-colors shadow-lg shadow-slate-200">
+                                Suivre
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Infos Utilisateur -->
+                <div class="space-y-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-slate-900">{{ user.fullName ?? user.pseudo }}</h1>
+                        <p class="text-gray-500">@{{ user.pseudo }}</p>
+                    </div>
+
+                    {% if user.bio %}
+                        <p class="text-gray-800 max-w-2xl leading-relaxed">
+                            {{ user.bio }}
+                        </p>
+                    {% endif %}
+
+                    <div class="flex items-center gap-6 text-gray-500 text-sm">
+                        <div class="flex items-center gap-1">
+                            <span class="text-slate-900 font-bold">142</span>
+                            <span>abonnements</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-slate-900 font-bold">1,2k</span>
+                            <span>abonnés</span>
+                        </div>
+                         <div class="flex items-center gap-1">
+                             <span class="text-2xl mr-1">📅</span>
+                            <span>A rejoint en {{ user.createdAt|date('F Y') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Onglets du profil -->
+        <div class="flex border-b border-gray-200">
+            <button class="px-6 py-4 text-slate-900 font-semibold border-b-2 border-slate-900 hover:bg-gray-50 transition-colors">Posts</button>
+            <button class="px-6 py-4 text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50 transition-colors">Réponses</button>
+            <button class="px-6 py-4 text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50 transition-colors">Médias</button>
+            <button class="px-6 py-4 text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50 transition-colors">J'aime</button>
+        </div>
+
+        <!-- Liste des posts (Placeholder) -->
+        <div class="space-y-4">
+            <div class="bg-white p-10 text-center rounded-2xl border border-gray-100">
+                <p class="text-gray-500 text-lg">Aucun post pour le moment.</p>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}
