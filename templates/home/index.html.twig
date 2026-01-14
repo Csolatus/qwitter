@@ -1,184 +1,128 @@
-{% extends 'base.html.twig' %}
+{% extends 'base_headless.html.twig' %}
 
-{% block title %}Qwitter{% endblock %}
+{% block title %}Qwitter - Connexion / Inscription{% endblock %}
 
 {% block body %}
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        background-color: #4a4a4a;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        color: white;
-    }
-    .container {
-        width: 100%;
-        max-width: 400px;
-        text-align: center;
-        padding: 20px;
-    }
-    h1 {
-        margin-bottom: 3rem;
-        font-weight: 600;
-        font-size: 1.5rem;
-    }
-    .input-group {
-        margin-bottom: 2rem;
-        text-align: left;
-        position: relative;
-    }
-    label {
-        display: block;
-        background-color: #7b8fa3;
-        color: white;
-        padding: 5px 20px;
-        border-radius: 10px;
-        width: fit-content;
-        position: absolute;
-        top: -15px; /* Adjust to overlap or sit on top */
-        left: 0;
-        font-size: 1rem;
-    }
-    input {
-        width: 100%;
-        padding: 15px;
-        padding-top: 15px;
-        border-radius: 25px;
-        border: none;
-        background-color: #e6e9ed;
-        outline: none;
-        font-size: 1rem;
-        box-sizing: border-box;
-    }
-    
-    /* Small bar simulation inside input */
-    .input-bar {
-        height: 5px;
-        width: 30px;
-        background-color: #8c9095;
-        border-radius: 5px;
-        margin-top: 10px;
-        margin-left: 15px;
-    }
-
-    .btn-primary {
-        background-color: #4285f4;
-        color: white;
-        border: none;
-        padding: 10px 40px;
-        border-radius: 20px;
-        font-size: 1rem;
-        cursor: pointer;
-        margin-top: 10px;
-        font-weight: 500;
-    }
-    .btn-primary:hover {
-        background-color: #3367d6;
-    }
-
-    .google-btn {
-        background-color: #222;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 8px 20px;
-        border-radius: 20px;
-        text-decoration: none;
-        margin: 0 auto 20px auto;
-        width: fit-content;
-        border: 1px solid #333;
-    }
-    
-    .switch-link {
-        display: block;
-        margin-top: 15px;
-        color: white;
-        text-decoration: underline;
-        cursor: pointer;
-        font-size: 0.9rem;
-    }
-</style>
-
-<div class="container">
-    {% if error %}
-        <div style="color: #ff6b6b; margin-bottom: 20px;">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
-
-    <!-- Login Form -->
-    <div id="login-section">
-        <h1>Se connecter à Qwitter</h1>
-        <form method="post" action="{{ path('home') }}">
-            <div class="input-group">
-                <label>Email</label>
-                <input type="email" name="_username" value="{{ last_username }}" required autofocus>
-                <div class="input-bar"></div>
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden">
+        {# Section d'erreur #}
+        {% if error %}
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4" role="alert">
+                <p>{{ error.messageKey|trans(error.messageData, 'security') }}</p>
             </div>
-            <div class="input-group">
-                <label>Mot de passe</label>
-                <input type="password" name="_password" required>
-                <div class="input-bar"></div>
+        {% endif %}
+
+        {# Conteneur principal #}
+        <div class="p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-slate-800 mb-2">Qwitter</h1>
+                <p class="text-gray-500">Rejoignez la conversation dès aujourd'hui.</p>
             </div>
-            
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-            <a href="#" class="google-btn">
-                <span style="font-weight:bold; color:#4285f4;">G</span>
-                 Se connecter avec google
-            </a>
+            {# Formulaire de connexion #}
+            <div id="sectionConnexion">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6 text-center">Se connecter</h2>
+                <form method="post" action="{{ path('home') }}" class="space-y-4">
+                    <div>
+                        <label for="loginEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="loginEmail" name="_username" value="{{ last_username }}" required autofocus
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                               placeholder="votre@email.com">
+                    </div>
+                    <div>
+                        <label for="loginPassword" class="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+                        <input type="password" id="loginPassword" name="_password" required
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                               placeholder="••••••••">
+                    </div>
 
-            <button type="submit" class="btn-primary">Se connecter</button>
-        </form>
-        <a class="switch-link" onclick="toggleForms()">S'inscrire</a>
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <button type="submit" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg shadow-slate-200">
+                        Se connecter
+                    </button>
+                    
+                     <div class="relative flex py-2 items-center">
+                        <div class="flex-grow border-t border-gray-200"></div>
+                        <span class="flex-shrink-0 mx-4 text-gray-400 text-sm">Ou</span>
+                        <div class="flex-grow border-t border-gray-200"></div>
+                    </div>
+
+                     <a href="#" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium py-3 px-4 rounded-xl transition-all">
+                        <span class="text-lg font-bold text-blue-500">G</span>
+                        <span>Continuer avec Google</span>
+                    </a>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <p class="text-gray-600 text-sm">Pas encore de compte ?</p>
+                    <button onclick="basculerFormulaires()" class="mt-2 text-blue-600 hover:text-blue-800 font-semibold transition-colors">
+                        S'inscrire sur Qwitter
+                    </button>
+                </div>
+            </div>
+
+            {# Formulaire d'inscription #}
+            <div id="sectionInscription" class="hidden">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6 text-center">Créer un compte</h2>
+                <form method="post" action="{{ path('app_register') }}" class="space-y-4">
+                    <div>
+                        <label for="registerPseudo" class="block text-sm font-medium text-gray-700 mb-1">Pseudo</label>
+                        <input type="text" id="registerPseudo" name="pseudo" required
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                               placeholder="@pseudo">
+                    </div>
+                    <div>
+                        <label for="registerEmail" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" id="registerEmail" name="email" required
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                               placeholder="votre@email.com">
+                    </div>
+                    <div>
+                        <label for="registerNomComplet" class="block text-sm font-medium text-gray-700 mb-1">Nom complet</label>
+                        <input type="text" id="registerNomComplet" name="nom_complet"
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                               placeholder="Jean Dupont">
+                    </div>
+                    <div>
+                        <label for="registerPassword" class="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+                        <input type="password" id="registerPassword" name="password" required
+                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                               placeholder="••••••••">
+                    </div>
+
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-lg shadow-blue-200">
+                        S'inscrire
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center">
+                    <p class="text-gray-600 text-sm">Déjà un compte ?</p>
+                    <button onclick="basculerFormulaires()" class="mt-2 text-slate-600 hover:text-slate-800 font-semibold transition-colors">
+                        Se connecter
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-
-    <!-- Register Form -->
-    <div id="register-section" style="display: none;">
-        <h1>S'inscrire sur Qwitter</h1>
-        <form method="post" action="{{ path('app_register') }}">
-            <div class="input-group">
-                <label>Email</label>
-                <input type="email" name="email" required>
-                <div class="input-bar"></div>
-            </div>
-             <div class="input-group">
-                <label>Mot de passe</label>
-                <input type="password" name="password" required>
-                <div class="input-bar"></div>
-            </div>
-            <div class="input-group">
-                <label>Nom complet</label>
-                <input type="text" name="nom_complet">
-                <div class="input-bar"></div>
-            </div>
-             <div class="input-group">
-                <label>Pseudo</label>
-                <input type="text" name="pseudo" required>
-                <div class="input-bar"></div>
-            </div>
-
-            <button type="submit" class="btn-primary">S'inscrire</button>
-        </form>
-        <a class="switch-link" onclick="toggleForms()">Se connecter</a>
-    </div>
-</div>
 
 <script>
-    function toggleForms() {
-        var login = document.getElementById('login-section');
-        var register = document.getElementById('register-section');
-        if (login.style.display === 'none') {
-            login.style.display = 'block';
-            register.style.display = 'none';
+    /**
+     * Bascule l'affichage entre le formulaire de connexion et d'inscription
+     */
+    function basculerFormulaires() {
+        const sectionConnexion = document.getElementById('sectionConnexion');
+        const sectionInscription = document.getElementById('sectionInscription');
+        
+        if (sectionConnexion.classList.contains('hidden')) {
+            // Afficher connexion
+            sectionConnexion.classList.remove('hidden');
+            sectionInscription.classList.add('hidden');
         } else {
-            login.style.display = 'none';
-            register.style.display = 'block';
+            // Afficher inscription
+            sectionConnexion.classList.add('hidden');
+            sectionInscription.classList.remove('hidden');
         }
     }
 </script>
 {% endblock %}
+
