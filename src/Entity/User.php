@@ -7,6 +7,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Like;
+use App\Entity\Message;
+use App\Entity\Notification;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -46,6 +49,21 @@ class User
 
     #[ORM\Column(nullable: true)]
     private ?\DateTime $updated_at = null;
+
+    #[ORM\Column(options: ['default' => false])]
+    private ?bool $isPrivate = false;
+
+    #[ORM\Column(length: 20, options: ['default' => 'everyone'])]
+    private ?string $messagePrivacy = 'everyone'; // everyone, followers, nobody
+
+    #[ORM\Column(options: ['default' => true])]
+    private ?bool $isOnlineVisible = true;
+
+    #[ORM\Column(options: ['default' => true])]
+    private ?bool $isIndexed = true;
+
+    #[ORM\Column(options: ['default' => false])]
+    private ?bool $is2FAEnabled = false;
 
     /**
      * @var Collection<int, Post>
@@ -196,6 +214,66 @@ class User
     public function setUpdatedAt(?\DateTime $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function isPrivate(): ?bool
+    {
+        return $this->isPrivate;
+    }
+
+    public function setIsPrivate(bool $isPrivate): static
+    {
+        $this->isPrivate = $isPrivate;
+
+        return $this;
+    }
+
+    public function getMessagePrivacy(): ?string
+    {
+        return $this->messagePrivacy;
+    }
+
+    public function setMessagePrivacy(string $messagePrivacy): static
+    {
+        $this->messagePrivacy = $messagePrivacy;
+
+        return $this;
+    }
+
+    public function isOnlineVisible(): ?bool
+    {
+        return $this->isOnlineVisible;
+    }
+
+    public function setIsOnlineVisible(bool $isOnlineVisible): static
+    {
+        $this->isOnlineVisible = $isOnlineVisible;
+
+        return $this;
+    }
+
+    public function isIndexed(): ?bool
+    {
+        return $this->isIndexed;
+    }
+
+    public function setIsIndexed(bool $isIndexed): static
+    {
+        $this->isIndexed = $isIndexed;
+
+        return $this;
+    }
+
+    public function is2FAEnabled(): ?bool
+    {
+        return $this->is2FAEnabled;
+    }
+
+    public function setIs2FAEnabled(bool $is2FAEnabled): static
+    {
+        $this->is2FAEnabled = $is2FAEnabled;
 
         return $this;
     }
