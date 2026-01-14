@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Form\ProfileType;
 use App\Form\PrivacyType;
 use App\Form\SecurityType;
+use App\Form\BillingType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,6 +32,8 @@ class SettingsController extends AbstractController
             $formClass = PrivacyType::class;
         } elseif ($onglet === 'security') {
             $formClass = SecurityType::class;
+        } elseif ($onglet === 'billing') {
+            $formClass = BillingType::class;
         }
 
         // Instantiation du formulaire

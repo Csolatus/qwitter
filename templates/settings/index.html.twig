@@ -218,9 +218,74 @@
             </div>
 
         {% elseif onglet_actif == 'billing' %}
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-10 text-center">
-                <h3 class="text-lg font-medium text-slate-800">Facturation</h3>
-                <p class="text-gray-500 mt-2">Gérez vos abonnements et moyens de paiement.</p>
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
+                <!-- Mon Abonnement -->
+                <div class="space-y-6">
+                    <h3 class="text-lg font-bold text-slate-800 border-b border-gray-100 pb-4 mb-6">Mon Abonnement</h3>
+                    
+                    <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center justify-between">
+                        <div>
+                            <span class="inline-block px-3 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-full mb-2">ACTUEL</span>
+                            <h4 class="text-xl font-bold text-slate-800">Plan Gratuit</h4>
+                            <p class="text-gray-500 mt-1">Accès basique aux fonctionnalités de Qwitter.</p>
+                        </div>
+                        <button class="px-6 py-2.5 rounded-xl bg-slate-800 text-white font-medium hover:bg-slate-900 shadow-lg shadow-slate-200 transition-all">
+                            Passer Premium
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Méthode de paiement -->
+                <div class="space-y-6 pt-8">
+                    <h3 class="text-lg font-bold text-slate-800 border-b border-gray-100 pb-4 mb-6">Moyen de paiement</h3>
+                    
+                    <div class="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-xl">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-8 bg-slate-800 rounded flex items-center justify-center text-white text-xs font-bold tracking-widest">VISA</div>
+                            <div>
+                                <p class="font-semibold text-slate-800">Visa terminant par 4242</p>
+                                <p class="text-sm text-gray-400">Expire le 12/28</p>
+                            </div>
+                        </div>
+                        <button class="text-sm font-medium text-slate-600 hover:text-slate-800">Modifier</button>
+                    </div>
+                    
+                    <button class="text-sm font-medium text-slate-600 hover:text-slate-800 flex items-center gap-2 mt-4">
+                        <span>+ Ajouter une nouvelle carte</span>
+                    </button>
+                </div>
+
+                <!-- Factures -->
+                 <div class="space-y-6 pt-8">
+                    <h3 class="text-lg font-bold text-slate-800 border-b border-gray-100 pb-4 mb-6">Historique des factures</h3>
+                    
+                    <div class="border border-gray-100 rounded-xl overflow-hidden">
+                        <table class="w-full text-left text-sm text-gray-600">
+                            <thead class="bg-gray-50 text-gray-500 font-medium border-b border-gray-100">
+                                <tr>
+                                    <th class="px-6 py-3">Date</th>
+                                    <th class="px-6 py-3">Montant</th>
+                                    <th class="px-6 py-3">Statut</th>
+                                    <th class="px-6 py-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4">14 Jan 2026</td>
+                                    <td class="px-6 py-4 font-medium text-slate-800">0,00 €</td>
+                                    <td class="px-6 py-4"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold">Payé</span></td>
+                                    <td class="px-6 py-4 text-right"><a href="#" class="text-slate-600 hover:text-slate-800 hover:underline">Télécharger</a></td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="px-6 py-4">14 Dec 2025</td>
+                                    <td class="px-6 py-4 font-medium text-slate-800">0,00 €</td>
+                                    <td class="px-6 py-4"><span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold">Payé</span></td>
+                                    <td class="px-6 py-4 text-right"><a href="#" class="text-slate-600 hover:text-slate-800 hover:underline">Télécharger</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
         {% else %}
