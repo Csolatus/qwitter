@@ -1,0 +1,271 @@
+{# templates/profile/show.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ user.fullName|default(user.pseudo) }} (@{{ user.pseudo }}) / Qwitter{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* --- STYLE PROFIL QWITTER --- */
+        :root {
+            --bg-color: #000000;
+            --text-primary: #e7e9ea;
+            --text-secondary: #71767b;
+            --border-color: #2f3336;
+            --qwitter-blue: #1d9bf0;
+            --hover-bg: rgba(239, 243, 244, 0.1);
+        }
+
+        /* Si ton base.html.twig a déjà un body, assure-toi que ces styles s'appliquent */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+        }
+
+        .profile-container {
+            max-width: 600px;
+            margin: 0 auto;
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            min-height: 100vh;
+            background-color: var(--bg-color);
+        }
+
+        /* En-tête Sticky */
+        .profile-header {
+            position: sticky;
+            top: 0;
+            background-color: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(12px);
+            z-index: 50;
+            padding: 4px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            height: 53px;
+        }
+
+        .back-btn {
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .back-btn:hover { background-color: var(--hover-bg); }
+
+        .header-info { display: flex; flex-direction: column; }
+        .header-info h2 { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.2; }
+        .header-count { font-size: 13px; color: var(--text-secondary); }
+
+        /* Bannière */
+        .banner {
+            height: 200px;
+            background-color: #333639;
+            background-image: linear-gradient(to bottom right, #333639, #15202b);
+            position: relative;
+        }
+
+        /* Zone Infos */
+        .profile-details { padding: 12px 16px; position: relative; }
+
+        .avatar-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: -15%;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .avatar {
+            width: 134px; height: 134px;
+            border-radius: 50%;
+            border: 4px solid var(--bg-color);
+            background-color: var(--bg-color);
+            object-fit: cover;
+        }
+
+        /* Boutons */
+        .btn-qwitter {
+            background: transparent;
+            border: 1px solid #536471;
+            color: var(--text-primary);
+            font-weight: 700;
+            padding: 7px 16px;
+            border-radius: 9999px;
+            text-decoration: none;
+            font-size: 15px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .btn-qwitter:hover { background-color: var(--hover-bg); }
+        
+        .btn-qwitter.primary {
+            background-color: #eff3f4;
+            color: #0f1419;
+            border: 1px solid #eff3f4;
+        }
+        .btn-qwitter.primary:hover { background-color: #d7dbdc; }
+
+        /* Textes Profil */
+        .user-name { font-size: 20px; font-weight: 800; margin-bottom: 2px; color: var(--text-primary); }
+        .user-pseudo { color: var(--text-secondary); font-size: 15px; margin-bottom: 12px; }
+        .user-bio { font-size: 15px; margin-bottom: 12px; line-height: 1.5; white-space: pre-wrap; }
+        
+        .user-joined { 
+            color: var(--text-secondary); 
+            font-size: 15px; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            margin-bottom: 12px; 
+        }
+        .user-joined svg { fill: currentColor; }
+
+        .follow-stats { display: flex; gap: 20px; font-size: 14px; margin-bottom: 16px; }
+        .stat-link { text-decoration: none; color: var(--text-secondary); }
+        .stat-link:hover { text-decoration: underline; }
+        .stat-num { color: var(--text-primary); font-weight: 700; }
+
+        /* Onglets */
+        .tabs { display: flex; border-bottom: 1px solid var(--border-color); }
+        .tab {
+            flex: 1; 
+            text-align: center; 
+            padding: 16px 0;
+            color: var(--text-secondary); 
+            font-weight: 500; 
+            cursor: pointer;
+            position: relative; 
+            transition: 0.2s;
+        }
+        .tab:hover { background-color: var(--hover-bg); }
+        .tab.active { color: var(--text-primary); font-weight: 700; }
+        .tab.active::after {
+            content: ''; 
+            position: absolute; 
+            bottom: 0; 
+            left: 50%;
+            transform: translateX(-50%);
+            width: 56px; /* Largeur de la barre bleue */
+            height: 4px; 
+            background-color: var(--qwitter-blue); 
+            border-radius: 2px;
+        }
+
+        /* Qweets Feed */
+        .qweet {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex; gap: 12px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .qweet:hover { background-color: rgba(255, 255, 255, 0.03); }
+        
+        .qweet-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+        .qweet-content { flex: 1; }
+        .qweet-header { margin-bottom: 2px; }
+        .qweet-author { font-weight: 700; color: var(--text-primary); margin-right: 4px; }
+        .qweet-meta { color: var(--text-secondary); font-size: 15px; }
+        .qweet-text { margin: 0; font-size: 15px; line-height: 1.5; color: var(--text-primary); }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="profile-container">
+    
+    <!-- Header Sticky -->
+    <div class="profile-header">
+        <a href="/" class="back-btn" title="Retour">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"></path></svg>
+        </a>
+        <div class="header-info">
+            <h2>{{ user.fullName|default(user.pseudo) }}</h2>
+            <div class="header-count">{{ user.posts|length }} Qweets</div>
+        </div>
+    </div>
+
+    <!-- Bannière -->
+    <div class="banner"></div>
+
+    <!-- Infos Profil -->
+    <div class="profile-details">
+        <div class="avatar-wrapper">
+            <!-- Avatar -->
+            <img src="{{ user.avatar|default('https://ui-avatars.com/api/?background=000&color=fff&name=' ~ user.pseudo) }}" 
+                 alt="Avatar" class="avatar">
+            
+            <!-- Bouton Action -->
+            {% if app.user and app.user == user %}
+                <a href="#" class="btn-qwitter">Éditer le profil</a>
+            {% else %}
+                <button class="btn-qwitter primary">Suivre</button>
+            {% endif %}
+        </div>
+
+        <div class="user-name">{{ user.fullName|default(user.pseudo) }}</div>
+        <div class="user-pseudo">@{{ user.pseudo }}</div>
+
+        <div class="user-bio">
+            {{ user.bio|default("Aucune description pour le moment.") }}
+        </div>
+
+        <div class="user-joined">
+            <!-- Icône Calendrier SVG -->
+            <svg viewBox="0 0 24 24" width="18" height="18" style="margin-right: 4px;"><path d="M7 4V3h2v1h6V3h2v1h1.5C19.89 4 21 5.12 21 6.5v12c0 1.38-1.11 2.5-2.5 2.5h-13C4.12 21 3 19.88 3 18.5v-12C3 5.12 4.12 4 5.5 4H7zm0 2H5.5c-.27 0-.5.22-.5.5v12c0 .28.23.5.5.5h13c.28 0 .5-.22.5-.5v-12c0-.28-.22-.5-.5-.5H17v1h-2V6H9v1H7V6zm0 6h2v-2H7v2zm0 4h2v-2H7v2zm4-4h2v-2h-2v2zm0 4h2v-2h-2v2zm4-4h2v-2h-2v2z"></path></svg>
+            A rejoint Qwitter en {{ user.createdAt|date('F Y') }}
+        </div>
+
+        <div class="follow-stats">
+            <a href="#" class="stat-link">
+                <span class="stat-num">14</span> <span class="stat-label">abonnements</span>
+            </a>
+            <a href="#" class="stat-link">
+                <span class="stat-num">0</span> <span class="stat-label">abonnés</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Onglets -->
+    <div class="tabs">
+        <div class="tab active">Qweets</div>
+        <div class="tab">Réponses</div>
+        <div class="tab">J'aime</div>
+    </div>
+
+    <!-- Fil des Qweets -->
+    <div class="qweets-feed">
+        {% for post in user.posts %}
+            <div class="qweet">
+                <img src="{{ user.avatar|default('https://ui-avatars.com/api/?background=000&color=fff&name=' ~ user.pseudo) }}" 
+                     class="qweet-avatar">
+                
+                <div class="qweet-content">
+                    <div class="qweet-header">
+                        <span class="qweet-author">{{ user.fullName|default(user.pseudo) }}</span>
+                        <span class="qweet-meta">@{{ user.pseudo }} · {{ post.createdAt|date('d M') }}</span>
+                    </div>
+                    <!-- On s'assure que le contenu du post existe -->
+                    <p class="qweet-text">{{ post.content|default('') }}</p>
+                </div>
+            </div>
+        {% else %}
+            <div style="padding: 40px 20px; text-align: center; color: var(--text-secondary);">
+                <p style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Aucun Qweet pour l'instant</p>
+                <p>Quand @{{ user.pseudo }} postera quelque chose, vous le verrez ici.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
