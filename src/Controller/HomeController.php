@@ -10,10 +10,33 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'home')]
-    public function index(AuthenticationUtils $authenticationUtils): Response
+    public function index(AuthenticationUtils $authenticationUtils, \Symfony\Bundle\SecurityBundle\Security $security, \Doctrine\ORM\EntityManagerInterface $entityManager, \App\Repository\PostRepository $postRepository, \Symfony\Component\HttpFoundation\Request $request): Response
     {
-        if ($this->getUser()) {
-            return $this->render('home/feed.html.twig');
+        $user = $security->getUser();
+
+        if ($user) {
+            // Handle new post creation
+            if ($request->isMethod('POST')) {
+                $content = $request->request->get('content');
+                if (!empty($content)) {
+                    $post = new \App\Entity\Post();
+                    $post->setContent($content);
+                    $post->setAuthor($user);
+                    $post->setCreatedAt(new \DateTimeImmutable());
+
+                    $entityManager->persist($post);
+                    $entityManager->flush();
+
+                    return $this->redirectToRoute('home');
+                }
+            }
+
+            // Fetch posts
+            $posts = $postRepository->findBy([], ['created_at' => 'DESC']);
+
+            return $this->render('home/feed.html.twig', [
+                'posts' => $posts
+            ]);
         }
 
         // get the login error if there is one
