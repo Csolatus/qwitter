@@ -11,17 +11,20 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class SettingsController extends AbstractController
 {
     #[Route('/parametres', name: 'app_parametres')]
-    public function index(Request $requete): Response
+    public function index(Request $requete, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
     {
-        // TODO: Récupérer l'utilisateur connecté via $this->getUser()
-        // Pour l'instant, on crée un utilisateur vide pour l'affichage
-        $utilisateur = new User();
-        $utilisateur->setPseudo('UtilisateurTest');
-        $utilisateur->setEmail('test@qwitter.com');
+        /** @var User $utilisateur */
+        $utilisateur = $this->getUser();
+
+        if (!$utilisateur) {
+            return $this->redirectToRoute('home');
+        }
 
         // Récupération de l'onglet actif (par défaut 'account')
         $onglet = $requete->query->get('tab', 'account');
@@ -41,9 +44,22 @@ class SettingsController extends AbstractController
         $formulaire->handleRequest($requete);
 
         if ($formulaire->isSubmitted() && $formulaire->isValid()) {
-            // Traitement du formulaire...
-            // $entityManager->persist($utilisateur);
-            // $entityManager->flush();
+
+            // Gestion spécifique pour le mot de passe si on est dans l'onglet sécurité
+            if ($onglet === 'security') {
+                $newPassword = $formulaire->get('newPassword')->getData();
+                if ($newPassword) {
+                    $hashedPassword = $passwordHasher->hashPassword($utilisateur, $newPassword);
+                    $utilisateur->setPassword($hashedPassword);
+                }
+            }
+
+            $entityManager->persist($utilisateur);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Vos paramètres ont été mis à jour avec succès.');
+
+            return $this->redirectToRoute('app_parametres', ['tab' => $onglet]);
         }
 
         // Rendu de la vue avec le formulaire et l'onglet actif
