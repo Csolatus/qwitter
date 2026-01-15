@@ -1,11 +1,16 @@
     <!-- Sidebar (Navigation) -->
     <aside class="w-64 bg-white border-r border-gray-200 flex flex-col justify-between fixed h-full z-10">
         <div class="p-6">
-            <!-- Logo -->
-            <div class="mb-8 flex items-center gap-3">
-                <div class="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-white font-bold">Q</div>
+            <!-- Logo Image Optimisé -->
+            <a href="{{ path('app_accueil') }}" class="mb-8 flex items-center gap-3 px-2 hover:opacity-80 transition-opacity">
+                <!-- Image du logo -->
+                <img src="{{ asset('logo/Logo_Qwitter.png') }}" 
+                     alt="Logo Qwitter" 
+                     class="w-10 h-10 object-contain rounded-lg">
+                
+                <!-- Nom du site -->
                 <span class="text-xl font-bold tracking-tight text-slate-800">Qwitter</span>
-            </div>
+            </a>
 
             <!-- Menu Principal -->
             <nav class="space-y-1">
@@ -17,12 +22,12 @@
                     <div class="w-5 h-5 bg-gray-200 rounded-md group-hover:bg-slate-200 transition-colors"></div>
                     <span class="font-medium">Découvrir</span>
                 </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-slate-800 rounded-xl transition-all group">
-                    <div class="w-5 h-5 bg-gray-200 rounded-md group-hover:bg-slate-200 transition-colors"></div>
+                <a href="{{ path('app_message_index') }}" class="flex items-center gap-3 px-4 py-3 {{ app.request.attributes.get('_route') == 'app_message_index' ? 'bg-slate-800 text-white shadow-lg shadow-slate-200' : 'text-gray-500 hover:bg-gray-50 hover:text-slate-800' }} rounded-xl transition-all group">
+                    <div class="w-5 h-5 {{ app.request.attributes.get('_route') == 'app_message_index' ? 'bg-white/20' : 'bg-gray-200' }} rounded-md group-hover:bg-slate-200 transition-colors"></div>
                     <span class="font-medium">Messages</span>
                 </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-slate-800 rounded-xl transition-all group">
-                    <div class="w-5 h-5 bg-gray-200 rounded-md group-hover:bg-slate-200 transition-colors"></div>
+                <a href="{{ path('app_notifications') }}" class="flex items-center gap-3 px-4 py-3 {{ app.request.attributes.get('_route') == 'app_notifications' ? 'bg-slate-800 text-white shadow-lg shadow-slate-200' : 'text-gray-500 hover:bg-gray-50 hover:text-slate-800' }} rounded-xl transition-all group">
+                    <div class="w-5 h-5 {{ app.request.attributes.get('_route') == 'app_notifications' ? 'bg-white/20' : 'bg-gray-200' }} rounded-md group-hover:bg-slate-200 transition-colors"></div>
                     <span class="font-medium">Notifications</span>
                 </a>
             </nav>
@@ -38,10 +43,13 @@
                     <div class="w-5 h-5 {{ app.request.attributes.get('_route') == 'app_profile' ? 'bg-white/20' : 'bg-gray-200' }} rounded-md group-hover:bg-slate-200 transition-colors"></div>
                     <span class="font-medium">Profil</span>
                 </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-slate-800 rounded-xl transition-all group">
-                    <div class="w-5 h-5 bg-gray-200 rounded-md group-hover:bg-slate-200 transition-colors"></div>
+                
+                <!-- Lien Contact Modifié -->
+                <a href="{{ path('app_contact') }}" class="flex items-center gap-3 px-4 py-3 {{ app.request.attributes.get('_route') == 'app_contact' ? 'bg-slate-800 text-white shadow-lg shadow-slate-200' : 'text-gray-500 hover:bg-gray-50 hover:text-slate-800' }} rounded-xl transition-all group">
+                    <div class="w-5 h-5 {{ app.request.attributes.get('_route') == 'app_contact' ? 'bg-white/20' : 'bg-gray-200' }} rounded-md group-hover:bg-slate-200 transition-colors"></div>
                     <span class="font-medium">Nous Contacter</span>
                 </a>
+
                 <!-- Lien Actif -->
                 <a href="{{ path('app_parametres') }}" class="flex items-center gap-3 px-4 py-3 {{ app.request.attributes.get('_route') == 'app_parametres' ? 'bg-slate-800 text-white shadow-lg shadow-slate-200' : 'text-gray-500 hover:bg-gray-50 hover:text-slate-800' }} rounded-xl transition-all">
                     <div class="w-5 h-5 {{ app.request.attributes.get('_route') == 'app_parametres' ? 'bg-white/20' : 'bg-gray-200' }} rounded-md"></div>
