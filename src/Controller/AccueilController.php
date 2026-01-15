@@ -65,37 +65,53 @@ class AccueilController extends AbstractController
             return $this->redirectToRoute('app_accueil');
         }
 
-        // 1. Récupère les posts (Soi-même + Abonnements)
+        // Gestion des onglets "Pour vous" / "Abonnements"
+        $feedType = $request->query->get('feed', 'foryou');
         $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('app_login');
-        }
-        /** @var \App\Entity\User $user */
 
-        $following = $user->getFollowing()->toArray();
-        $authors = array_merge($following, [$user]);
-        $posts = $postRepo->findBy(['author' => $authors], ['created_at' => 'DESC']);
+        // Si l'utilisateur n'est pas connecté, on force le mode "foryou"
+        if (!$user) {
+            $feedType = 'foryou';
+        }
+
+        if ($feedType === 'following' && $user) {
+            /** @var \App\Entity\User $user */
+            $following = $user->getFollowing()->toArray();
+            $authors = array_merge($following, [$user]);
+            // On utilise findBy avec un tableau d'auteurs (Doctrine supporte IN automatiquement)
+            $posts = $postRepo->findBy(['author' => $authors], ['created_at' => 'DESC']);
+        } else {
+            // Par défaut ("foryou") : tous les posts
+            $posts = $postRepo->findBy([], ['created_at' => 'DESC']);
+        }
 
         // 2. Suggestions (Exclure les abonnements et soi-même)
-        $allUsers = $userRepo->findAll();
-        $suggestions = [];
-        $followingIds = array_map(fn($u) => $u->getId(), $following);
-        $followingIds[] = $user->getId();
+        if ($user) {
+            $allUsers = $userRepo->findAll();
+            $suggestions = [];
 
-        foreach ($allUsers as $potentialUser) {
-            if (!in_array($potentialUser->getId(), $followingIds)) {
-                $suggestions[] = $potentialUser;
+            $following = $user->getFollowing()->toArray();
+            $followingIds = array_map(fn($u) => $u->getId(), $following);
+            $followingIds[] = $user->getId();
+
+            foreach ($allUsers as $potentialUser) {
+                if (!in_array($potentialUser->getId(), $followingIds)) {
+                    $suggestions[] = $potentialUser;
+                }
             }
+            // Shuffle and take 3
+            shuffle($suggestions);
+            $suggestions = array_slice($suggestions, 0, 3);
+        } else {
+            // Si pas connecté, suggestions aléatoires simples
+            $suggestions = $userRepo->findBy([], ['created_at' => 'DESC'], 3);
         }
-
-        // Shuffle and take 3
-        shuffle($suggestions);
-        $suggestions = array_slice($suggestions, 0, 3);
 
         return $this->render('accueil/index.html.twig', [
             'posts' => $posts,
             'suggestions' => $suggestions,
             'form' => $form->createView(),
+            'current_feed' => $feedType,
         ]);
     }
 }

@@ -40,4 +40,21 @@ class PostRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    /**
+     * @param array $authorIds
+     * @return Post[]
+     */
+    public function findByAuthors(array $authorIds): array
+    {
+        if (empty($authorIds)) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.author IN (:authorIds)')
+            ->setParameter('authorIds', $authorIds)
+            ->orderBy('p.created_at', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
