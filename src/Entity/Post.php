@@ -52,6 +52,7 @@ class Post
         $this->hashtags = new ArrayCollection();
         $this->comments = new ArrayCollection();
         $this->likes = new ArrayCollection();
+        $this->reposts = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -151,6 +152,55 @@ class Post
     public function removeHashtag(Hashtag $hashtag): static
     {
         $this->hashtags->removeElement($hashtag);
+
+        return $this;
+    }
+
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'reposts')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?self $originalPost = null;
+
+    #[ORM\OneToMany(mappedBy: 'originalPost', targetEntity: self::class)]
+    private Collection $reposts;
+
+    public function getOriginalPost(): ?self
+    {
+        return $this->originalPost;
+    }
+
+    public function setOriginalPost(?self $originalPost): self
+    {
+        $this->originalPost = $originalPost;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getReposts(): Collection
+    {
+        return $this->reposts;
+    }
+
+    public function addRepost(self $repost): self
+    {
+        if (!$this->reposts->contains($repost)) {
+            $this->reposts->add($repost);
+            $repost->setOriginalPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRepost(self $repost): self
+    {
+        if ($this->reposts->removeElement($repost)) {
+            // set the owning side to null (unless already changed)
+            if ($repost->getOriginalPost() === $this) {
+                $repost->setOriginalPost(null);
+            }
+        }
 
         return $this;
     }

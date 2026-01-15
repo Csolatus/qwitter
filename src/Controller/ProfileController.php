@@ -3,15 +3,16 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Doctrine\ORM\EntityManagerInterface;
 
 class ProfileController extends AbstractController
 {
     #[Route('/profil/{slug}', name: 'app_profile', defaults: ['slug' => null])]
-    public function index(?string $slug, EntityManagerInterface $entityManager): Response
+    public function index(?string $slug, EntityManagerInterface $entityManager, Request $request): Response
     {
         // Si aucun slug n'est fourni, on redirige vers le profil de l'utilisateur connecté
         if (!$slug) {
@@ -35,15 +36,40 @@ class ProfileController extends AbstractController
             }
         }
 
-        // Récupérer les posts de l'utilisateur triés par date décroissante
-        $posts = $entityManager->getRepository(\App\Entity\Post::class)->findBy(
-            ['author' => $user],
-            ['created_at' => 'DESC']
-        );
+        // Gestion des onglets
+        $tab = $request->query->get('tab', 'posts');
+        $data = [];
+
+        switch ($tab) {
+            case 'likes':
+                $likes = $entityManager->getRepository(\App\Entity\Like::class)->findBy(
+                    ['user' => $user],
+                    ['created_at' => 'DESC']
+                );
+                // On récupère les posts associés aux likes
+                $data = array_map(fn($like) => $like->getPost(), $likes);
+                break;
+
+            case 'replies':
+                $data = $entityManager->getRepository(\App\Entity\Comment::class)->findBy(
+                    ['author' => $user],
+                    ['created_at' => 'DESC']
+                );
+                break;
+
+            case 'posts':
+            default:
+                $data = $entityManager->getRepository(\App\Entity\Post::class)->findBy(
+                    ['author' => $user],
+                    ['created_at' => 'DESC']
+                );
+                break;
+        }
 
         return $this->render('profile/index.html.twig', [
             'user' => $user, // L'utilisateur dont on regarde le profil
-            'posts' => $posts,
+            'data' => $data,
+            'current_tab' => $tab,
             'is_me' => $this->getUser() === $user, // Est-ce mon propre profil ?
         ]);
     }

@@ -75,81 +75,50 @@
 
         <!-- Onglets du profil -->
         <div class="flex border-b border-gray-200">
-            <button class="px-6 py-4 text-slate-900 font-semibold border-b-2 border-slate-900 hover:bg-gray-50 transition-colors">Posts</button>
-            <button class="px-6 py-4 text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50 transition-colors">Réponses</button>
-            <button class="px-6 py-4 text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50 transition-colors">Médias</button>
-            <button class="px-6 py-4 text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50 transition-colors">J'aime</button>
+            <a href="{{ path('app_profile', {'slug': user.slug, 'tab': 'posts'}) }}" class="px-6 py-4 {{ current_tab == 'posts' ? 'text-slate-900 font-bold border-b-2 border-slate-900' : 'text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50' }} transition-colors">Posts</a>
+            <a href="{{ path('app_profile', {'slug': user.slug, 'tab': 'replies'}) }}" class="px-6 py-4 {{ current_tab == 'replies' ? 'text-slate-900 font-bold border-b-2 border-slate-900' : 'text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50' }} transition-colors">Réponses</a>
+            <a href="{{ path('app_profile', {'slug': user.slug, 'tab': 'likes'}) }}" class="px-6 py-4 {{ current_tab == 'likes' ? 'text-slate-900 font-bold border-b-2 border-slate-900' : 'text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50' }} transition-colors">J'aime</a>
         </div>
 
-        <!-- Liste des posts -->
-        <div class="space-y-0"> <!-- Removed spacing between posts relative to container, handle border in article -->
-            {% for post in posts %}
-                 <article class="p-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer flex gap-4 bg-white first:rounded-t-2xl last:rounded-b-2xl border-x border-t last:border-b-0">
-                    <!-- Avatar Auteur Post -->
-                    <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
-                        {% if post.author.avatar %}
-                            <img src="{{ asset('uploads/avatars/' ~ post.author.avatar) }}" class="w-full h-full object-cover">
-                        {% else %}
-                            <img src="https://ui-avatars.com/api/?name={{ post.author.pseudo }}&background=random" class="w-full h-full object-cover">
-                        {% endif %}
-                    </div>
-                    
-                    <!-- Contenu -->
-                    <div class="flex-1">
-                        <div class="flex justify-between items-start">
-                            <div class="flex items-center gap-1 mb-0.5">
-                                <span class="font-bold text-slate-900 hover:underline">{{ post.author.fullName }}</span>
-                                <span class="text-gray-500 text-sm">@{{ post.author.pseudo }}</span>
-                                <span class="text-gray-500 text-sm">· {{ post.createdAt|date('d M') }}</span>
-                            </div>
-                            <div class="flex gap-2">
-                                    <!-- Delete Button (Only for Author or Admin) -->
-                                {% if app.user and (post.author == app.user or is_granted('ROLE_ADMIN')) %}
-                                    <form method="post" action="{{ path('app_post_delete', {'id': post.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
-                                        <button class="text-gray-400 hover:text-red-600 rounded-full p-1 hover:bg-red-50 transition">🗑️</button>
-                                    </form>
-                                {% endif %}
-                                <button class="text-gray-400 hover:text-slate-600 rounded-full p-1 hover:bg-blue-50 transition">•••</button>
-                            </div>
-                        </div>
-                        
-                        <p class="text-slate-800 leading-normal text-[15px] whitespace-pre-wrap">{{ post.content }}</p>
-
-                        {% if post.imageFilename %}
-                            <div class="mt-3 rounded-2xl overflow-hidden border border-gray-100 max-h-[400px]">
-                                <img src="{{ asset('uploads/posts/' ~ post.imageFilename) }}" alt="Post image" class="w-full h-full object-cover">
-                            </div>
-                        {% endif %}
-
-                        <!-- Actions -->
-                        <div class="flex justify-between mt-3 max-w-[350px] text-gray-500">
-                            <button class="flex items-center gap-1 hover:text-blue-500 group text-sm transition">
-                                <div class="p-1.5 rounded-full group-hover:bg-blue-50 transition">💬</div>
-                                <span>0</span>
-                            </button>
-                            <button class="flex items-center gap-1 hover:text-green-500 group text-sm transition">
-                                <div class="p-1.5 rounded-full group-hover:bg-green-50 transition">🔁</div>
-                                <span>0</span>
-                            </button>
-                            <a href="{{ path('app_post_like', {'id': post.id}) }}" class="flex items-center gap-1 {{ post.likes|filter(l => l.user == app.user)|length > 0 ? 'text-pink-600' : 'hover:text-pink-500' }} group text-sm transition">
-                                <div class="p-1.5 rounded-full group-hover:bg-pink-50 transition">
-                                    {{ post.likes|filter(l => l.user == app.user)|length > 0 ? '❤️' : '♡' }}
-                                </div>
-                                <span>{{ post.likes|length }}</span>
-                            </a>
-                            <button class="flex items-center gap-1 hover:text-blue-500 group text-sm transition">
-                                <div class="p-1.5 rounded-full group-hover:bg-blue-50 transition">📊</div>
-                                <span>0</span>
-                            </button>
-                        </div>
-                    </div>
-                </article>
-            {% else %}
-                <div class="bg-white p-10 text-center rounded-2xl border border-gray-100">
-                    <p class="text-gray-500 text-lg">Aucun post pour le moment.</p>
+        <!-- Liste du contenu -->
+        <div class="space-y-0">
+            {% if data is empty %}
+                <div class="bg-white p-10 text-center rounded-2xl border border-gray-100 mt-4">
+                    <p class="text-gray-500 text-lg">Rien à afficher ici pour le moment.</p>
                 </div>
-            {% endfor %}
+            {% else %}
+                {% if current_tab == 'replies' %}
+                    {# Affichage des Commentaires (Réponses) #}
+                    {% for comment in data %}
+                        <div class="p-4 border-b border-gray-100 hover:bg-gray-50 transition flex gap-4 bg-white">
+                             <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
+                                {% if comment.author.avatar %}
+                                    <img src="{{ asset('uploads/avatars/' ~ comment.author.avatar) }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    <img src="https://ui-avatars.com/api/?name={{ comment.author.pseudo }}&background=random" class="w-full h-full object-cover">
+                                {% endif %}
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-bold text-slate-900">{{ comment.author.fullName }}</span>
+                                    <span class="text-gray-500 text-sm">@{{ comment.author.pseudo }}</span>
+                                    <span class="text-gray-500 text-sm">· {{ comment.createdAt|date('d M') }}</span>
+                                    <span class="text-gray-400 text-sm">en réponse à un post</span>
+                                </div>
+                                <p class="text-slate-800">{{ comment.content }}</p>
+                                <div class="mt-2 text-blue-500 text-sm hover:underline cursor-pointer">
+                                    Voir le post original
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {# Affichage des Posts (Posts ou J'aime) #}
+                    {% for post in data %}
+                        {% include 'partials/_post.html.twig' with {'post': post} %}
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
         </div>
 
     </div>
