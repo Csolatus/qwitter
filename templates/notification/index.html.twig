@@ -27,9 +27,9 @@
         </div>
 
         <!-- Notifications List -->
-        <div class="divide-y divide-gray-100" id="notifications-list">
+        <div class="flex flex-col" id="notifications-list">
             {% for notification in notifications %}
-                <div class="notification-item p-4 hover:bg-gray-50 transition-colors duration-150 cursor-pointer flex items-start gap-4 {{ notification.read ? 'opacity-60' : 'bg-blue-50/30' }}" data-type="{{ notification.type }}">
+                <div class="notification-item p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors duration-150 cursor-pointer flex items-start gap-4 {{ notification.read ? 'opacity-60' : 'bg-blue-50/30' }}" data-type="{{ notification.type }}">
                    <!-- Icon Type -->
                    <div class="relative flex-shrink-0">
                         <div class="w-10 h-10 rounded-full {{ notification.author.avatar_color }} flex items-center justify-center font-bold text-sm">
@@ -81,15 +81,25 @@
         const buttons = document.querySelectorAll('.filter-btn');
         const items = document.querySelectorAll('.notification-item');
 
+        const activeClasses = ['text-blue-600', 'border-b-2', 'border-blue-600', 'active'];
+        const inactiveClasses = ['text-gray-500', 'hover:text-gray-700'];
+
+        function setButtonState(btn, isActive) {
+            if (isActive) {
+                btn.classList.remove(...inactiveClasses);
+                btn.classList.add(...activeClasses);
+            } else {
+                btn.classList.remove(...activeClasses);
+                btn.classList.add(...inactiveClasses);
+            }
+        }
+
         buttons.forEach(btn => {
             btn.addEventListener('click', () => {
-                // Update buttons state
-                buttons.forEach(b => {
-                    b.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600', 'active');
-                    b.classList.add('text-gray-500');
-                });
-                btn.classList.remove('text-gray-500');
-                btn.classList.add('text-blue-600', 'border-b-2', 'border-blue-600', 'active');
+                // Reset all buttons
+                buttons.forEach(b => setButtonState(b, false));
+                // Activate clicked button
+                setButtonState(btn, true);
 
                 const filter = btn.dataset.filter;
 
@@ -97,7 +107,7 @@
                 items.forEach(item => {
                     if (filter === 'all' || item.dataset.type === filter) {
                         item.classList.remove('hidden');
-                        // Small animation reset
+                        // Animation reset
                         item.style.animation = 'none';
                         item.offsetHeight; /* trigger reflow */
                         item.style.animation = 'fadeIn 0.3s ease-out';
