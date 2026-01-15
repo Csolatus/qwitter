@@ -125,7 +125,10 @@
                                 <div class="text-gray-500 text-xs">@{{ user.pseudo }}</div>
                             </div>
                         </div>
-                        <button class="bg-slate-900 text-white text-xs font-bold px-4 py-1.5 rounded-full hover:bg-slate-700 transition">Suivre</button>
+                        <form action="{{ path('app_follow', {'id': user.id}) }}" method="post" class="flex-shrink-0">
+                            <input type="hidden" name="_token" value="{{ csrf_token('follow' ~ user.id) }}">
+                            <button type="submit" class="bg-slate-900 text-white text-xs font-bold px-4 py-1.5 rounded-full hover:bg-slate-700 transition">Suivre</button>
+                        </form>
                     </div>
                 {% else %}
                     <div class="px-4 py-3 text-sm text-gray-500">Pas encore de suggestions.</div>
