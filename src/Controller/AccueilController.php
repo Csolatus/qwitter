@@ -135,10 +135,10 @@ class AccueilController extends AbstractController
             }
             // Shuffle and take 3
             shuffle($suggestions);
-            $suggestions = array_slice($suggestions, 0, 3);
+            $suggestions = array_slice($suggestions, 0, 10);
         } else {
             // Si pas connecté, suggestions aléatoires simples
-            $suggestions = $userRepo->findBy([], ['created_at' => 'DESC'], 3);
+            $suggestions = $userRepo->findBy([], ['created_at' => 'DESC'], 10);
         }
 
         return $this->render('accueil/index.html.twig', [
