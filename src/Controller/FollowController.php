@@ -42,11 +42,11 @@ class FollowController extends AbstractController
         $token = $request->request->get('_token');
         if (!$this->isCsrfTokenValid('follow' . $userToFollow->getId(), $token)) {
             $this->addFlash('error', 'Token de sécurité invalide. Veuillez réessayer.');
-            return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('home'));
+            return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_accueil'));
         }
 
         if ($userToFollow === $currentUser) {
-            return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('home'));
+            return $this->redirect($request->headers->get('referer') ?? $this->generateUrl('app_accueil'));
         }
 
         if ($currentUser->isFollowing($userToFollow)) {

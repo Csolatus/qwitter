@@ -66,7 +66,8 @@
             </button>
             
             <form method="post" action="{{ path('app_post_repost', {'id': displayPost.id}) }}">
-                <button class="flex items-center gap-1 hover:text-green-500 group text-sm transition">
+                <input type="hidden" name="_token" value="{{ csrf_token('repost' ~ displayPost.id) }}">
+                <button type="submit" class="flex items-center gap-1 hover:text-green-500 group text-sm transition">
                     <div class="p-1.5 rounded-full group-hover:bg-green-50 transition">🔁</div>
                     <span>{{ displayPost.reposts|length }}</span>
                 </button>
