@@ -44,6 +44,10 @@ class PostRepository extends ServiceEntityRepository
      * @param array $authorIds
      * @return Post[]
      */
+    /**
+     * @param array $authorIds
+     * @return Post[]
+     */
     public function findByAuthors(array $authorIds): array
     {
         if (empty($authorIds)) {
@@ -56,5 +60,45 @@ class PostRepository extends ServiceEntityRepository
             ->orderBy('p.created_at', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Trouve les posts pour le fil "Pour vous" (exclut les comptes privés non suivis)
+     */
+    public function findForYou(?\App\Entity\User $user): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.author', 'u')
+            ->addSelect('u')
+            ->orderBy('p.created_at', 'DESC');
+
+        if ($user) {
+            // Si connecté :
+            // 1. Auteurs non privés
+            // 2. OU Auteurs que je suis (même privés)
+            // 3. OU Moi-même
+            $qb->leftJoin('u.followers', 'f')
+                ->where('u.isPrivate = false')
+                ->orWhere('f.id = :userId')
+                ->orWhere('u.id = :userId')
+                ->setParameter('userId', $user->getId());
+        } else {
+            // Si non connecté : seulement les comptes publics
+            $qb->where('u.isPrivate = false');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Trouve les posts pour le fil "Abonnements"
+     */
+    public function findFollowingFeed(\App\Entity\User $user): array
+    {
+        $following = $user->getFollowing()->toArray();
+        $authorIds = array_map(fn($u) => $u->getId(), $following);
+        $authorIds[] = $user->getId(); // Inclure ses propres posts
+
+        return $this->findByAuthors($authorIds);
     }
 }

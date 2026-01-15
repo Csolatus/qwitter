@@ -47,8 +47,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $fullName = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $google_id = null;
+
 
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
@@ -249,17 +248,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getGoogleId(): ?string
-    {
-        return $this->google_id;
-    }
 
-    public function setGoogleId(string $google_id): static
-    {
-        $this->google_id = $google_id;
-
-        return $this;
-    }
 
     public function getCreatedAt(): ?\DateTimeImmutable
     {
@@ -295,6 +284,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->isPrivate = $isPrivate;
 
         return $this;
+    }
+
+    /**
+     * Determines if the user's content (posts, likes) can be viewed by the given viewer.
+     */
+    public function canBeViewedBy(?UserInterface $viewer): bool
+    {
+        // Public profile: always visible
+        if (!$this->isPrivate) {
+            return true;
+        }
+
+        // Private profile:
+        // 1. Viewer is the owner -> Visible
+        // 2. Viewer follows the owner -> Visible
+        if ($viewer && ($viewer === $this || $this->getFollowers()->contains($viewer))) {
+            return true;
+        }
+
+        return false;
     }
 
     public function getMessagePrivacy(): ?string
