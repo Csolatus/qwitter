@@ -1,0 +1,234 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Mes messages - Qwitter{% endblock %}
+
+{% block body %}
+<!-- 
+    Structure principale sans double scrollbar
+    h-screen et overflow-hidden permettent de gérer le scroll uniquement dans la zone de chat
+-->
+<div class="flex h-screen bg-white overflow-hidden relative">
+
+    <!-- Pas de sidebar ici car elle est déjà incluse dans base.html.twig -->
+
+    <!-- ZONE DE MESSAGERIE GLOBALE -->
+    <div class="flex flex-1 h-full relative">
+        
+        <!-- COLONNE GAUCHE : LISTE DES CONTACTS (Largeur fixe) -->
+        <div class="w-full md:w-80 border-r border-gray-200 flex flex-col bg-white z-10">
+            
+            <!-- En-tête "Discussions" + Bouton Nouveau Message -->
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
+                <h1 class="font-bold text-xl text-gray-800">Discussions</h1>
+                
+                <!-- BOUTON NOUVEAU MESSAGE (+) -->
+                <button onclick="toggleModal('new-chat-modal')" 
+                        class="w-10 h-10 rounded-full bg-gray-100 hover:bg-blue-50 text-gray-600 hover:text-blue-600 flex items-center justify-center transition duration-200"
+                        title="Nouvelle discussion">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Barre de recherche rapide (Filtre JS) -->
+            <div class="px-4 py-2">
+                <div class="relative">
+                    <input type="text" id="search-sidebar" onkeyup="filterList('search-sidebar', 'sidebar-list')" placeholder="Rechercher..." 
+                           class="w-full bg-gray-100 text-sm rounded-xl px-4 py-2 pl-9 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Liste scrollable des utilisateurs -->
+            <div class="flex-1 overflow-y-auto" id="sidebar-list">
+                {% for user in users %}
+                    {% if user != app.user %}
+                        <a href="{{ path('app_message_show', {id: user.id}) }}" 
+                           class="user-item flex items-center gap-3 p-4 hover:bg-gray-50 cursor-pointer transition border-b border-gray-50 {{ otherUser and otherUser.id == user.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : '' }}">
+                            
+                            <!-- Avatar -->
+                            <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 flex-shrink-0">
+                                {{ user.username|first|upper }}
+                            </div>
+                            
+                            <!-- Info -->
+                            <div class="overflow-hidden">
+                                <div class="font-semibold text-gray-900 truncate user-name">{{ user.username }}</div>
+                                <div class="text-xs text-gray-500 truncate">Cliquez pour discuter</div>
+                            </div>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- COLONNE DROITE : LE CHAT -->
+        <div class="flex-1 flex flex-col bg-white relative {{ otherUser ? 'block' : 'hidden md:flex' }}">
+            
+            {% if otherUser %}
+                <!-- EN-TÊTE DU CHAT -->
+                <div class="p-4 border-b border-gray-200 flex items-center justify-between bg-white/95 backdrop-blur z-10 sticky top-0">
+                    <div class="flex items-center gap-3">
+                        <!-- Retour mobile -->
+                        <a href="{{ path('app_message_index') }}" class="md:hidden text-gray-500 hover:text-gray-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                            </svg>
+                        </a>
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center font-bold text-white text-sm shadow-md">
+                            {{ otherUser.username|first|upper }}
+                        </div>
+                        <div>
+                            <div class="font-bold text-gray-900 leading-tight">{{ otherUser.username }}</div>
+                            <div class="text-xs text-green-500 font-medium flex items-center gap-1">
+                                <span class="w-2 h-2 bg-green-500 rounded-full inline-block"></span> En ligne
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ZONE DES MESSAGES -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 scroll-smooth">
+                    {% for message in conversation %}
+                        {% set isMe = message.sender == app.user %}
+                        
+                        <div class="flex w-full {{ isMe ? 'justify-end' : 'justify-start' }} group">
+                            <div class="max-w-[75%] md:max-w-[60%] px-4 py-2 shadow-sm text-sm relative 
+                                        {{ isMe ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm' : 'bg-white text-gray-800 border border-gray-200 rounded-2xl rounded-tl-sm' }}">
+                                
+                                <p class="leading-relaxed">{{ message.content|nl2br }}</p>
+                                
+                                <div class="text-[10px] mt-1 text-right opacity-70">
+                                    {{ message.createdAt|date('H:i') }}
+                                </div>
+
+                                {% if isMe %}
+                                    <!-- Bouton supprimer au survol -->
+                                    <div class="absolute top-1/2 -translate-y-1/2 -left-8 opacity-0 group-hover:opacity-100 transition">
+                                        <form method="post" action="{{ path('app_message_delete', {'id': message.id}) }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ message.id) }}">
+                                            <button class="text-gray-300 hover:text-red-500 p-1">×</button>
+                                        </form>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="h-full flex flex-col items-center justify-center text-gray-400 opacity-50">
+                            <p>Aucun message. Dites bonjour ! 👋</p>
+                        </div>
+                    {% endfor %}
+                    <div id="scroll-anchor"></div>
+                </div>
+
+                <!-- ZONE DE SAISIE CORRIGÉE (Sans double bouton) -->
+                <div class="p-4 border-t border-gray-200 bg-white">
+                    {{ form_start(form, {'attr': {'class': 'flex gap-3 items-end'}}) }}
+                        
+                        <!-- IMPORTANT : On affiche manuellement le token CSRF car render_rest est false -->
+                        {{ form_row(form._token) }}
+                        
+                        <div class="hidden">{{ form_row(form.receiver) }}</div>
+                        
+                        <div class="flex-1 relative">
+                            {{ form_widget(form.content, {'attr': {
+                                'class': 'w-full border-0 bg-gray-100 rounded-3xl px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-800 resize-none overflow-hidden max-h-32',
+                                'placeholder': 'Écrivez votre message...',
+                                'rows': '1',
+                                'oninput': 'this.style.height = ""; this.style.height = this.scrollHeight + "px"'
+                            }}) }}
+                        </div>
+                        
+                        <!-- Bouton d'envoi unique -->
+                        <button type="submit" class="bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 transition shadow-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 translate-x-0.5 -translate-y-0.5">
+                                <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
+                            </svg>
+                        </button>
+
+                    <!-- render_rest: false empêche Symfony d'afficher son propre bouton "Submit" -->
+                    {{ form_end(form, {'render_rest': false}) }}
+                </div>
+
+            {% else %}
+                <!-- ÉCRAN D'ACCUEIL VIDE -->
+                <div class="flex-1 flex flex-col items-center justify-center text-gray-500 bg-slate-50">
+                    <h2 class="text-2xl font-bold text-gray-800">Vos messages</h2>
+                    <p class="text-gray-500 mt-2 mb-8">Envoyez des messages privés à vos amis.</p>
+                    <button onclick="toggleModal('new-chat-modal')" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition shadow-lg">
+                        Commencer une discussion
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- MODALE NOUVEAU MESSAGE -->
+<div id="new-chat-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" onclick="toggleModal('new-chat-modal')"></div>
+    <div class="fixed inset-0 z-10 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-lg">
+                <div class="bg-white px-4 py-4 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-gray-900">Nouveau message</h3>
+                    <button onclick="toggleModal('new-chat-modal')" class="text-gray-400 hover:text-gray-500 bg-gray-100 rounded-full p-1">✕</button>
+                </div>
+                
+                <!-- Recherche Modale -->
+                <div class="p-4 border-b border-gray-100">
+                    <input type="text" id="search-modal" onkeyup="filterList('search-modal', 'modal-list')" 
+                           class="w-full rounded-xl border-0 bg-gray-50 py-2.5 px-4 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-blue-600" 
+                           placeholder="Chercher quelqu'un...">
+                </div>
+
+                <!-- Liste Modale -->
+                <div class="max-h-80 overflow-y-auto p-2" id="modal-list">
+                    {% for user in users %}
+                        {% if user != app.user %}
+                            <a href="{{ path('app_message_show', {id: user.id}) }}" class="user-item flex items-center gap-3 p-3 hover:bg-blue-50 rounded-xl transition group">
+                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-gray-600">
+                                    {{ user.username|first|upper }}
+                                </div>
+                                <div>
+                                    <div class="font-semibold text-gray-900 user-name">{{ user.username }}</div>
+                                </div>
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        var element = document.getElementById("scroll-anchor");
+        if(element) element.scrollIntoView();
+    };
+
+    function toggleModal(modalID){
+        var modal = document.getElementById(modalID);
+        modal.classList.toggle("hidden");
+        if(!modal.classList.contains("hidden")){
+            setTimeout(() => document.getElementById('search-modal').focus(), 100);
+        }
+    }
+
+    function filterList(inputId, listId) {
+        var input = document.getElementById(inputId);
+        var filter = input.value.toUpperCase();
+        var items = document.getElementById(listId).getElementsByClassName('user-item');
+
+        for (var i = 0; i < items.length; i++) {
+            var txtValue = items[i].getElementsByClassName("user-name")[0].textContent || items[i].getElementsByClassName("user-name")[0].innerText;
+            items[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+        }
+    }
+</script>
+
+{% endblock %}

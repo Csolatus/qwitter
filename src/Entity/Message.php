@@ -26,7 +26,7 @@ class Message
     #[ORM\ManyToOne(inversedBy: 'messages')]
     private ?User $sender = null;
 
-    #[ORM\ManyToOne(inversedBy: 'messages')]
+    #[ORM\ManyToOne]
     private ?User $receiver = null;
 
     public function getId(): ?int

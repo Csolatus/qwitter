@@ -34,10 +34,19 @@
                                 Éditer le profil
                             </a>
                         {% else %}
-                             {# TODO: Bouton Suivre #}
-                            <button class="px-6 py-2 bg-slate-800 text-white font-semibold rounded-full hover:bg-slate-900 transition-colors shadow-lg shadow-slate-200">
-                                Suivre
-                            </button>
+                            <form action="{{ path('app_follow', {'id': user.id}) }}" method="post">
+                                <input type="hidden" name="_token" value="{{ csrf_token('follow' ~ user.id) }}">
+                                {% if app.user.isFollowing(user) %}
+                                    <button type="submit" class="group px-6 py-2 border border-gray-300 text-slate-900 font-semibold rounded-full hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all">
+                                        <span class="group-hover:hidden">Abonné</span>
+                                        <span class="hidden group-hover:inline">Se désabonner</span>
+                                    </button>
+                                {% else %}
+                                    <button type="submit" class="px-6 py-2 bg-slate-800 text-white font-semibold rounded-full hover:bg-slate-900 transition-colors shadow-lg shadow-slate-200">
+                                        Suivre
+                                    </button>
+                                {% endif %}
+                            </form>
                         {% endif %}
                     </div>
                 </div>
@@ -57,11 +66,11 @@
 
                     <div class="flex items-center gap-6 text-gray-500 text-sm">
                         <div class="flex items-center gap-1">
-                            <span class="text-slate-900 font-bold">142</span>
+                            <span class="text-slate-900 font-bold">{{ user.following|length }}</span>
                             <span>abonnements</span>
                         </div>
                         <div class="flex items-center gap-1">
-                            <span class="text-slate-900 font-bold">1,2k</span>
+                            <span class="text-slate-900 font-bold">{{ user.followers|length }}</span>
                             <span>abonnés</span>
                         </div>
                          <div class="flex items-center gap-1">
@@ -75,17 +84,50 @@
 
         <!-- Onglets du profil -->
         <div class="flex border-b border-gray-200">
-            <button class="px-6 py-4 text-slate-900 font-semibold border-b-2 border-slate-900 hover:bg-gray-50 transition-colors">Posts</button>
-            <button class="px-6 py-4 text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50 transition-colors">Réponses</button>
-            <button class="px-6 py-4 text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50 transition-colors">Médias</button>
-            <button class="px-6 py-4 text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50 transition-colors">J'aime</button>
+            <a href="{{ path('app_profile', {'slug': user.slug, 'tab': 'posts'}) }}" class="px-6 py-4 {{ current_tab == 'posts' ? 'text-slate-900 font-bold border-b-2 border-slate-900' : 'text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50' }} transition-colors">Posts</a>
+            <a href="{{ path('app_profile', {'slug': user.slug, 'tab': 'replies'}) }}" class="px-6 py-4 {{ current_tab == 'replies' ? 'text-slate-900 font-bold border-b-2 border-slate-900' : 'text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50' }} transition-colors">Réponses</a>
+            <a href="{{ path('app_profile', {'slug': user.slug, 'tab': 'likes'}) }}" class="px-6 py-4 {{ current_tab == 'likes' ? 'text-slate-900 font-bold border-b-2 border-slate-900' : 'text-gray-500 font-medium hover:text-slate-900 hover:bg-gray-50' }} transition-colors">J'aime</a>
         </div>
 
-        <!-- Liste des posts (Placeholder) -->
-        <div class="space-y-4">
-            <div class="bg-white p-10 text-center rounded-2xl border border-gray-100">
-                <p class="text-gray-500 text-lg">Aucun post pour le moment.</p>
-            </div>
+        <!-- Liste du contenu -->
+        <div class="space-y-0">
+            {% if data is empty %}
+                <div class="bg-white p-10 text-center rounded-2xl border border-gray-100 mt-4">
+                    <p class="text-gray-500 text-lg">Rien à afficher ici pour le moment.</p>
+                </div>
+            {% else %}
+                {% if current_tab == 'replies' %}
+                    {# Affichage des Commentaires (Réponses) #}
+                    {% for comment in data %}
+                        <div class="p-4 border-b border-gray-100 hover:bg-gray-50 transition flex gap-4 bg-white">
+                             <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
+                                {% if comment.author.avatar %}
+                                    <img src="{{ asset('uploads/avatars/' ~ comment.author.avatar) }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    <img src="https://ui-avatars.com/api/?name={{ comment.author.pseudo }}&background=random" class="w-full h-full object-cover">
+                                {% endif %}
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-bold text-slate-900">{{ comment.author.fullName }}</span>
+                                    <span class="text-gray-500 text-sm">@{{ comment.author.pseudo }}</span>
+                                    <span class="text-gray-500 text-sm">· {{ comment.createdAt|date('d M') }}</span>
+                                    <span class="text-gray-400 text-sm">en réponse à un post</span>
+                                </div>
+                                <p class="text-slate-800">{{ comment.content }}</p>
+                                <div class="mt-2 text-blue-500 text-sm hover:underline cursor-pointer">
+                                    Voir le post original
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {# Affichage des Posts (Posts ou J'aime) #}
+                    {% for post in data %}
+                        {% include 'partials/_post.html.twig' with {'post': post} %}
+                    {% endfor %}
+                {% endif %}
+            {% endif %}
         </div>
 
     </div>

@@ -14,13 +14,28 @@
         <main class="flex-1 max-w-[600px] w-full border-r border-gray-100 min-h-screen">
             
             <!-- Header Sticky -->
-            <div class="bg-white/90 backdrop-blur-md px-4 py-3 border-b border-gray-100 cursor-pointer">
-                <h1 class="text-xl font-bold text-slate-800">Accueil</h1>
+            <div class="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-gray-100 flex">
+                <a href="{{ path('app_accueil', {'feed': 'foryou'}) }}" class="flex-1 flex justify-center items-center hover:bg-gray-100 transition py-4">
+                    <div class="relative">
+                        <span class="{{ (current_feed is not defined or current_feed == 'foryou') ? 'font-bold text-slate-900' : 'font-medium text-gray-500' }}">Pour vous</span>
+                        {% if current_feed is not defined or current_feed == 'foryou' %}
+                            <div class="absolute -bottom-4 left-0 right-0 h-1 bg-slate-800 rounded-full"></div>
+                        {% endif %}
+                    </div>
+                </a>
+                <a href="{{ path('app_accueil', {'feed': 'following'}) }}" class="flex-1 flex justify-center items-center hover:bg-gray-100 transition py-4">
+                    <div class="relative">
+                        <span class="{{ (current_feed is defined and current_feed == 'following') ? 'font-bold text-slate-900' : 'font-medium text-gray-500' }}">Abonnements</span>
+                        {% if current_feed is defined and current_feed == 'following' %}
+                            <div class="absolute -bottom-4 left-0 right-0 h-1 bg-slate-800 rounded-full"></div>
+                        {% endif %}
+                    </div>
+                </a>
             </div>
 
             <!-- Création de Post -->
             <div class="p-4 border-b border-gray-100 pb-2">
-                <div class="flex gap-4">
+                {{ form_start(form, {'action': path('app_accueil'), 'attr': {'class': 'flex gap-4'}}) }}
                     <div class="w-10 h-10 rounded-full bg-slate-200 flex-shrink-0 overflow-hidden">
                         <!-- Avatar Utilisateur Connecté -->
                         {% if app.user and app.user.avatar %}
@@ -32,68 +47,62 @@
                         {% endif %}
                     </div>
                     <div class="flex-1">
-                        <textarea placeholder="Quoi de neuf ?" class="w-full border-none focus:ring-0 text-lg resize-none placeholder-gray-400 text-slate-800 h-12 p-2 outline-none bg-transparent"></textarea>
+                        {{ form_widget(form.content) }}
+                        <div class="text-red-500 text-sm py-1">{{ form_errors(form.content) }}</div>
+                        
+                                <!-- Image Preview Container -->
+                        <div id="image-preview-container" class="hidden mt-2 relative inline-block">
+                            <img id="image-preview" src="" alt="Aperçu" class="w-full h-auto max-h-80 rounded-xl object-contain bg-black/5 border border-gray-200">
+                            <button type="button" id="remove-image-btn" class="absolute top-2 right-2 bg-gray-900/50 hover:bg-gray-900/70 text-white rounded-full p-1 transition backdrop-blur-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Poll Form Container -->
+                        <div id="poll-form-container" class="hidden mt-3 border border-gray-200 rounded-xl p-4 bg-gray-50/50">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-sm font-bold text-gray-700">Créer un sondage</h3>
+                                <button type="button" id="remove-poll-btn" class="text-gray-400 hover:text-red-500 transition">✕</button>
+                            </div>
+                            
+                            {{ form_widget(form.pollQuestion) }}
+                            
+                            <div class="space-y-2 mt-2">
+                                {{ form_widget(form.pollOption1) }}
+                                {{ form_widget(form.pollOption2) }}
+                                <div class="relative">
+                                     {{ form_widget(form.pollOption3) }}
+                                </div>
+                                <div class="relative">
+                                     {{ form_widget(form.pollOption4) }}
+                                </div>
+                            </div>
+                        </div>
                         
                         <div class="flex justify-between items-center mt-2 border-t border-gray-50 pt-2">
-                            <div class="flex gap-1 text-slate-400">
-                                <button class="hover:bg-blue-50 hover:text-blue-500 p-2 rounded-full transition" title="Image">📷</button>
-                                <button class="hover:bg-blue-50 hover:text-blue-500 p-2 rounded-full transition" title="GIF">GIF</button>
-                                <button class="hover:bg-blue-50 hover:text-blue-500 p-2 rounded-full transition" title="Sondage">📊</button>
-                                <button class="hover:bg-blue-50 hover:text-blue-500 p-2 rounded-full transition" title="Emoji">😊</button>
+                            <div class="flex gap-1 text-slate-400 items-center">
+                                <label for="{{ form.image.vars.id }}" class="hover:bg-blue-50 hover:text-blue-500 p-2 rounded-full transition cursor-pointer" title="Image">
+                                    📷
+                                </label>
+                                {{ form_widget(form.image) }}
+                                <div class="text-red-500 text-sm">{{ form_errors(form.image) }}</div>
+
+                                <button type="button" class="hover:bg-blue-50 hover:text-blue-500 p-2 rounded-full transition" title="GIF">GIF</button>
+                                <button type="button" id="poll-toggle-btn" class="hover:bg-blue-50 hover:text-blue-500 p-2 rounded-full transition" title="Sondage">📊</button>
+                                <button type="button" class="hover:bg-blue-50 hover:text-blue-500 p-2 rounded-full transition" title="Emoji">😊</button>
                             </div>
-                            <button class="bg-slate-800 text-white px-5 py-1.5 rounded-full font-bold text-sm hover:bg-slate-900 transition opacity-50 cursor-not-allowed">Poster</button>
+                            <button type="submit" class="bg-slate-800 text-white px-5 py-1.5 rounded-full font-bold text-sm hover:bg-slate-900 transition">Poster</button>
                         </div>
                     </div>
-                </div>
+                {{ form_end(form) }}
             </div>
 
             <!-- Fil des Posts -->
             <div class="posts-feed">
                 {% for post in posts %}
-                    <article class="p-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer flex gap-4">
-                        <!-- Avatar Auteur Post -->
-                        <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
-                            {% if post.author.avatar %}
-                                <img src="{{ asset('uploads/avatars/' ~ post.author.avatar) }}" class="w-full h-full object-cover">
-                            {% else %}
-                                <img src="https://ui-avatars.com/api/?name={{ post.author.pseudo }}&background=random" class="w-full h-full object-cover">
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Contenu -->
-                        <div class="flex-1">
-                            <div class="flex justify-between items-start">
-                                <div class="flex items-center gap-1 mb-0.5">
-                                    <span class="font-bold text-slate-900 hover:underline">{{ post.author.fullName }}</span>
-                                    <span class="text-gray-500 text-sm">@{{ post.author.pseudo }}</span>
-                                    <span class="text-gray-500 text-sm">· {{ post.createdAt|date('d M') }}</span>
-                                </div>
-                                <button class="text-gray-400 hover:text-slate-600 rounded-full p-1 hover:bg-blue-50 transition">•••</button>
-                            </div>
-                            
-                            <p class="text-slate-800 leading-normal text-[15px] whitespace-pre-wrap">{{ post.content }}</p>
-
-                            <!-- Actions -->
-                            <div class="flex justify-between mt-3 max-w-[350px] text-gray-500">
-                                <button class="flex items-center gap-1 hover:text-blue-500 group text-sm transition">
-                                    <div class="p-1.5 rounded-full group-hover:bg-blue-50 transition">💬</div>
-                                    <span>0</span>
-                                </button>
-                                <button class="flex items-center gap-1 hover:text-green-500 group text-sm transition">
-                                    <div class="p-1.5 rounded-full group-hover:bg-green-50 transition">🔁</div>
-                                    <span>0</span>
-                                </button>
-                                <button class="flex items-center gap-1 hover:text-pink-500 group text-sm transition">
-                                    <div class="p-1.5 rounded-full group-hover:bg-pink-50 transition">❤️</div>
-                                    <span>{{ post.likes|length }}</span>
-                                </button>
-                                <button class="flex items-center gap-1 hover:text-blue-500 group text-sm transition">
-                                    <div class="p-1.5 rounded-full group-hover:bg-blue-50 transition">📊</div>
-                                    <span>0</span>
-                                </button>
-                            </div>
-                        </div>
-                    </article>
+                    {% include 'partials/_post.html.twig' with {'post': post} %}
                 {% else %}
                     <!-- État vide -->
                     <div class="py-12 px-8 text-center">
@@ -110,13 +119,7 @@
         <!-- COLONNE 3 : WIDGETS (Suggestions, Recherche) -->
         <aside class="hidden lg:block w-[350px] pl-8 py-4 h-screen sticky top-0 overflow-y-auto">
             
-            <!-- Recherche -->
-            <div class="sticky top-0 bg-white pb-4 z-10 pt-1">
-                <div class="relative group">
-                    <span class="absolute left-4 top-3.5 text-gray-500 group-focus-within:text-blue-500">🔍</span>
-                    <input type="text" placeholder="Rechercher" class="w-full bg-gray-100 rounded-full py-3 pl-12 pr-4 text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none transition border-none">
-                </div>
-            </div>
+
 
             <!-- Bloc Tendances -->
             <div class="bg-gray-50 rounded-2xl mb-4 overflow-hidden border border-gray-100">
@@ -162,7 +165,10 @@
                                 <div class="text-gray-500 text-xs">@{{ user.pseudo }}</div>
                             </div>
                         </div>
-                        <button class="bg-slate-900 text-white text-xs font-bold px-4 py-1.5 rounded-full hover:bg-slate-700 transition">Suivre</button>
+                        <form action="{{ path('app_follow', {'id': user.id}) }}" method="post" class="flex-shrink-0">
+                            <input type="hidden" name="_token" value="{{ csrf_token('follow' ~ user.id) }}">
+                            <button type="submit" class="bg-slate-900 text-white text-xs font-bold px-4 py-1.5 rounded-full hover:bg-slate-700 transition">Suivre</button>
+                        </form>
                     </div>
                 {% else %}
                     <div class="px-4 py-3 text-sm text-gray-500">Pas encore de suggestions.</div>
@@ -182,4 +188,63 @@
 
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    function toggleCommentForm(postId) {
+        const form = document.getElementById('comment-form-' + postId);
+        form.classList.toggle('hidden');
+    }
+
+    // Image Preview Logic
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInput = document.getElementById('post_image'); // ID généré par Symfony, à vérifier
+        const previewContainer = document.getElementById('image-preview-container');
+        const previewImage = document.getElementById('image-preview');
+        const removeButton = document.getElementById('remove-image-btn');
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewContainer.classList.remove('hidden');
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        if (removeButton) {
+            removeButton.addEventListener('click', function() {
+                fileInput.value = ''; // Clear input
+                previewContainer.classList.add('hidden');
+                previewImage.src = '';
+            });
+        }
+
+        // Poll Toggle Logic
+        const pollBtn = document.getElementById('poll-toggle-btn');
+        const pollContainer = document.getElementById('poll-form-container');
+        const removePollBtn = document.getElementById('remove-poll-btn');
+
+        if (pollBtn && pollContainer) {
+            pollBtn.addEventListener('click', function() {
+                pollContainer.classList.remove('hidden');
+            });
+        }
+
+        if (removePollBtn && pollContainer) {
+            removePollBtn.addEventListener('click', function() {
+                pollContainer.classList.add('hidden');
+                // Optional: clear poll inputs
+                const inputs = pollContainer.querySelectorAll('input');
+                inputs.forEach(input => input.value = '');
+            });
+        }
+    });
+</script>
 {% endblock %}
