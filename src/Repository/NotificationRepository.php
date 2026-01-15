@@ -16,6 +16,20 @@ class NotificationRepository extends ServiceEntityRepository
         parent::__construct($registry, Notification::class);
     }
 
+    public function countUnreadNormalNotifications(\App\Entity\User $user): int
+    {
+        return $this->createQueryBuilder('n')
+            ->select('count(n.id)')
+            ->where('n.user = :user')
+            ->andWhere('n.is_read = :is_read')
+            ->andWhere('n.type != :type')
+            ->setParameter('user', $user)
+            ->setParameter('is_read', false)
+            ->setParameter('type', 'message')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     //    /**
     //     * @return Notification[] Returns an array of Notification objects
     //     */
