@@ -43,7 +43,7 @@ class PostController extends AbstractController
         return $this->redirect($referer ?? $this->generateUrl('app_accueil'));
     }
 
-    #[Route('/{id}/repost', name: 'app_post_repost', methods: ['POST'])]
+    #[Route('/{id}/repost', name: 'app_post_repost', methods: ['POST', 'GET'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function repost(Post $post, EntityManagerInterface $entityManager, Request $request, NotificationService $notificationService): Response
     {

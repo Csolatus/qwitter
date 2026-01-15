@@ -10,6 +10,7 @@
                 
                 <!-- Nom du site -->
                 <span class="text-xl font-bold tracking-tight text-slate-800">Qwitter</span>
+            </a>
 
             <!-- Menu Principal -->
             <nav class="space-y-1">
@@ -42,10 +43,13 @@
                     <div class="w-5 h-5 {{ app.request.attributes.get('_route') == 'app_profile' ? 'bg-white/20' : 'bg-gray-200' }} rounded-md group-hover:bg-slate-200 transition-colors"></div>
                     <span class="font-medium">Profil</span>
                 </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-slate-800 rounded-xl transition-all group">
-                    <div class="w-5 h-5 bg-gray-200 rounded-md group-hover:bg-slate-200 transition-colors"></div>
+                
+                <!-- Lien Contact Modifié -->
+                <a href="{{ path('app_contact') }}" class="flex items-center gap-3 px-4 py-3 {{ app.request.attributes.get('_route') == 'app_contact' ? 'bg-slate-800 text-white shadow-lg shadow-slate-200' : 'text-gray-500 hover:bg-gray-50 hover:text-slate-800' }} rounded-xl transition-all group">
+                    <div class="w-5 h-5 {{ app.request.attributes.get('_route') == 'app_contact' ? 'bg-white/20' : 'bg-gray-200' }} rounded-md group-hover:bg-slate-200 transition-colors"></div>
                     <span class="font-medium">Nous Contacter</span>
                 </a>
+
                 <!-- Lien Actif -->
                 <a href="{{ path('app_parametres') }}" class="flex items-center gap-3 px-4 py-3 {{ app.request.attributes.get('_route') == 'app_parametres' ? 'bg-slate-800 text-white shadow-lg shadow-slate-200' : 'text-gray-500 hover:bg-gray-50 hover:text-slate-800' }} rounded-xl transition-all">
                     <div class="w-5 h-5 {{ app.request.attributes.get('_route') == 'app_parametres' ? 'bg-white/20' : 'bg-gray-200' }} rounded-md"></div>

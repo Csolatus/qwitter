@@ -15,7 +15,7 @@
                 <span class="mr-1">🔁</span>
             </div>
         {% endif %}
-        <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden relative z-10" onclick="event.stopPropagation(); window.location='{{ path('app_profile', {'id': displayPost.author.id}) }}'">
+        <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden relative z-10" onclick="event.stopPropagation(); window.location='{{ path('app_profile', {'slug': displayPost.author.slug}) }}'">
             {% if displayPost.author.avatar %}
                 <img src="{{ asset('uploads/avatars/' ~ displayPost.author.avatar) }}" class="w-full h-full object-cover">
             {% else %}
@@ -28,13 +28,13 @@
     <div class="flex-1 min-w-0">
         {% if isRepost %}
             <div class="text-xs text-gray-500 font-bold mb-1 flex items-center gap-1">
-                <a href="{{ path('app_profile', {'id': post.author.id}) }}" class="hover:underline" onclick="event.stopPropagation()">{{ post.author.fullName }}</a> a republié
+                <a href="{{ path('app_profile', {'slug': post.author.slug}) }}" class="hover:underline" onclick="event.stopPropagation()">{{ post.author.fullName }}</a> a republié
             </div>
         {% endif %}
 
         <div class="flex justify-between items-start">
             <div class="flex items-center gap-1 mb-0.5 max-w-full overflow-hidden">
-                <a href="{{ path('app_profile', {'id': displayPost.author.id}) }}" class="font-bold text-slate-900 hover:underline truncate" onclick="event.stopPropagation()">{{ displayPost.author.fullName }}</a>
+                <a href="{{ path('app_profile', {'slug': displayPost.author.slug}) }}" class="font-bold text-slate-900 hover:underline truncate" onclick="event.stopPropagation()">{{ displayPost.author.fullName }}</a>
                 <span class="text-gray-500 text-sm truncate">@{{ displayPost.author.pseudo }}</span>
                 <span class="text-gray-500 text-sm flex-shrink-0">· {{ displayPost.createdAt|date('d M') }}</span>
             </div>
@@ -66,7 +66,8 @@
             </button>
             
             <form method="post" action="{{ path('app_post_repost', {'id': displayPost.id}) }}">
-                <button class="flex items-center gap-1 hover:text-green-500 group text-sm transition">
+                <input type="hidden" name="_token" value="{{ csrf_token('repost' ~ displayPost.id) }}">
+                <button type="submit" class="flex items-center gap-1 hover:text-green-500 group text-sm transition">
                     <div class="p-1.5 rounded-full group-hover:bg-green-50 transition">🔁</div>
                     <span>{{ displayPost.reposts|length }}</span>
                 </button>
