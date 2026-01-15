@@ -117,29 +117,7 @@
                         {{ form_errors(formulaire.messagePrivacy) }}
                     </div>
 
-                    <h3 class="text-lg font-bold text-slate-800 border-b border-gray-100 pb-4 pt-4 mb-6">Autres Paramètres</h3>
 
-                    <!-- Statut en ligne -->
-                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                        <div>
-                            {{ form_label(formulaire.isOnlineVisible, null, {'label_attr': {'class': 'font-semibold text-slate-800'}}) }}
-                            <p class="text-sm text-gray-500">{{ formulaire.isOnlineVisible.vars.help }}</p>
-                        </div>
-                        <div class="flex items-center">
-                             {{ form_widget(formulaire.isOnlineVisible, {'attr': {'class': 'w-5 h-5 text-slate-600 rounded focus:ring-slate-500 border-gray-300'}}) }}
-                        </div>
-                    </div>
-
-                    <!-- Référencement -->
-                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                        <div>
-                            {{ form_label(formulaire.isIndexed, null, {'label_attr': {'class': 'font-semibold text-slate-800'}}) }}
-                            <p class="text-sm text-gray-500">{{ formulaire.isIndexed.vars.help }}</p>
-                        </div>
-                        <div class="flex items-center">
-                             {{ form_widget(formulaire.isIndexed, {'attr': {'class': 'w-5 h-5 text-slate-600 rounded focus:ring-slate-500 border-gray-300'}}) }}
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Actions -->
@@ -182,20 +160,7 @@
                     </div>
                 </div>
 
-                <!-- 2FA -->
-                <div class="space-y-6 pt-4">
-                    <h3 class="text-lg font-bold text-slate-800 border-b border-gray-100 pb-4 mb-6">Double Authentification</h3>
-                    
-                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
-                        <div>
-                            {{ form_label(formulaire.is2FAEnabled, null, {'label_attr': {'class': 'font-semibold text-slate-800'}}) }}
-                            <p class="text-sm text-gray-500">{{ formulaire.is2FAEnabled.vars.help }}</p>
-                        </div>
-                        <div class="flex items-center">
-                             {{ form_widget(formulaire.is2FAEnabled, {'attr': {'class': 'w-5 h-5 text-slate-600 rounded focus:ring-slate-500 border-gray-300'}}) }}
-                        </div>
-                    </div>
-                </div>
+
 
                 <!-- Historique de connexion (Statique pour l'instant) -->
                 <div class="space-y-6 pt-4">

@@ -18,6 +18,7 @@ class PostType extends AbstractType
         $builder
             ->add('content', TextareaType::class, [
                 'label' => false,
+                'required' => false,
                 'attr' => [
                     'placeholder' => 'Quoi de neuf ?',
                     'class' => 'w-full border-none focus:ring-0 text-lg resize-none placeholder-gray-400 text-slate-800 h-12 p-2 outline-none bg-transparent',
@@ -34,7 +35,7 @@ class PostType extends AbstractType
                 'attr' => ['class' => 'hidden'],
                 'constraints' => [
                     new File(
-                        maxSize: '5M',
+                        maxSize: '20M',
                         mimeTypes: [
                             'image/jpeg',
                             'image/png',

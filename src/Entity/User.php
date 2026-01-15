@@ -62,14 +62,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 20, options: ['default' => 'everyone'])]
     private ?string $messagePrivacy = 'everyone'; // everyone, followers, nobody
 
-    #[ORM\Column(options: ['default' => true])]
-    private ?bool $isOnlineVisible = true;
 
-    #[ORM\Column(options: ['default' => true])]
-    private ?bool $isIndexed = true;
 
-    #[ORM\Column(options: ['default' => false])]
-    private ?bool $is2FAEnabled = false;
+
+
+
 
     /**
      * @var Collection<int, Post>
@@ -312,41 +309,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isOnlineVisible(): ?bool
-    {
-        return $this->isOnlineVisible;
-    }
 
-    public function setIsOnlineVisible(bool $isOnlineVisible): static
-    {
-        $this->isOnlineVisible = $isOnlineVisible;
 
-        return $this;
-    }
 
-    public function isIndexed(): ?bool
-    {
-        return $this->isIndexed;
-    }
 
-    public function setIsIndexed(bool $isIndexed): static
-    {
-        $this->isIndexed = $isIndexed;
 
-        return $this;
-    }
-
-    public function is2FAEnabled(): ?bool
-    {
-        return $this->is2FAEnabled;
-    }
-
-    public function setIs2FAEnabled(bool $is2FAEnabled): static
-    {
-        $this->is2FAEnabled = $is2FAEnabled;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Post>
