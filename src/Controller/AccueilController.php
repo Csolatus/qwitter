@@ -29,63 +29,77 @@ class AccueilController extends AbstractController
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getUser();
-            if (!$user) {
-                return $this->redirectToRoute('app_login');
-            }
-
-            $post->setAuthor($user);
-            $post->setCreatedAt(new \DateTimeImmutable());
-
-            /** @var UploadedFile $imageFile */
-            $imageFile = $form->get('image')->getData();
-
-            if ($imageFile) {
-                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
-
-                try {
-                    $imageFile->move(
-                        $this->getParameter('posts_directory'),
-                        $newFilename
-                    );
-                } catch (FileException $e) {
-                    // ... handle exception if something happens during file upload
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                $user = $this->getUser();
+                if (!$user) {
+                    return $this->redirectToRoute('app_login');
                 }
 
-                $post->setImageFilename($newFilename);
-                $post->setMediaType('image'); // Simplified for now
-            }
+                $post->setAuthor($user);
+                $post->setCreatedAt(new \DateTimeImmutable());
 
-            // Gestion du Sondage
-            $pollQuestion = $form->get('pollQuestion')->getData();
-            if (!empty($pollQuestion)) {
-                $poll = new \App\Entity\Poll();
-                $poll->setQuestion($pollQuestion);
-                $poll->setPost($post);
-                $poll->setEndsAt(new \DateTime('+1 day')); // Default 24h duration
+                /** @var UploadedFile $imageFile */
+                $imageFile = $form->get('image')->getData();
 
-                // Options
-                for ($i = 1; $i <= 4; $i++) {
-                    $optionLabel = $form->get('pollOption' . $i)->getData();
-                    if (!empty($optionLabel)) {
-                        $option = new \App\Entity\PollOption();
-                        $option->setLabel($optionLabel);
-                        $poll->addOption($option);
+                if ($imageFile) {
+                    $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+                    try {
+                        $imageFile->move(
+                            $this->getParameter('posts_directory'),
+                            $newFilename
+                        );
+                        $post->setImageFilename($newFilename);
+                        $post->setMediaType('image');
+                    } catch (FileException $e) {
+                        $this->addFlash('error', 'Erreur lors de l\'upload de l\'image: ' . $e->getMessage());
                     }
                 }
 
-                if ($poll->getOptions()->count() >= 2) {
-                    $entityManager->persist($poll);
+                // Pour autoriser le post sans texte s'il y a une image (vérif manuelle si besoin, mais nullable géré par Doctrine)
+                if (empty($post->getContent()) && !$post->getImageFilename()) {
+                    $this->addFlash('error', 'Votre post ne peut pas être vide (ajoutez du texte ou une image).');
+                } else {
+                    $this->addFlash('success', 'Post publié avec succès !');
+
+                    // Gestion du Sondage
+                    $pollQuestion = $form->get('pollQuestion')->getData();
+                    if (!empty($pollQuestion)) {
+                        $poll = new \App\Entity\Poll();
+                        $poll->setQuestion($pollQuestion);
+                        $poll->setPost($post);
+                        $poll->setEndsAt(new \DateTime('+1 day'));
+
+                        // Options
+                        for ($i = 1; $i <= 4; $i++) {
+                            $optionLabel = $form->get('pollOption' . $i)->getData();
+                            if (!empty($optionLabel)) {
+                                $option = new \App\Entity\PollOption();
+                                $option->setLabel($optionLabel);
+                                $poll->addOption($option);
+                            }
+                        }
+
+                        if ($poll->getOptions()->count() >= 2) {
+                            $entityManager->persist($poll);
+                        }
+                    }
+
+                    $entityManager->persist($post);
+                    $entityManager->flush();
+
+                    return $this->redirectToRoute('app_accueil');
+                }
+            } else {
+                // Formulaire invalide : afficher les erreurs globales
+                $errors = $form->getErrors(true);
+                foreach ($errors as $error) {
+                    $this->addFlash('error', $error->getMessage());
                 }
             }
-
-            $entityManager->persist($post);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_accueil');
         }
 
         // Gestion des onglets "Pour vous" / "Abonnements"
