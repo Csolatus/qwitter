@@ -43,3 +43,10 @@ Suivez ces étapes pour installer et lancer le projet localement.
     ```bash
     docker-compose up -d --build
     ```
+    puis effectuer les 3 commandes suivantes pour les migrations
+    ```bash
+    docker exec -t qwitter-php-1 composer install
+    docker exec -t qwitter-php-1 php bin/console doctrine:migrations:migrate --no-interaction
+    docker exec -t qwitter-php-1 php bin/console doctrine:fixtures:load --no-interaction
+    ```
+   
