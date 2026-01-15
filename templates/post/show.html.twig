@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Post de {{ post.author.fullName }} / Qwitter{% endblock %}
+
+{% block body %}
+<!-- Header Sticky -->
+<div class="sticky top-0 bg-white/90 backdrop-blur-md px-4 py-3 border-b border-gray-100 flex items-center gap-4 z-10 w-full max-w-[600px] border-r">
+    <a href="javascript:history.back()" class="p-2 rounded-full hover:bg-gray-100 transition">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+        </svg>
+    </a>
+    <h1 class="text-xl font-bold text-slate-800">Post</h1>
+</div>
+
+<main class="w-full max-w-[600px] border-r border-gray-100 min-h-screen pb-20">
+    <!-- Main Post (Reusing Partial) -->
+    <div class="border-b border-gray-100">
+        {% include 'partials/_post.html.twig' with {'post': post} %}
+    </div>
+
+    <!-- Comments List -->
+    <div class="comments-section">
+        {% for comment in post.comments %}
+             <div class="p-4 border-b border-gray-100 hover:bg-gray-50 transition flex gap-4 bg-white">
+                 <div class="flex flex-col items-center">
+                     <div class="h-full w-0.5 bg-gray-200 -mt-4 mb-1"></div> <!-- Thread line connecting up -->
+                     <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden relative z-10">
+                        {% if comment.author.avatar %}
+                            <img src="{{ asset('uploads/avatars/' ~ comment.author.avatar) }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ comment.author.pseudo }}&background=random" class="w-full h-full object-cover">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="font-bold text-slate-900">{{ comment.author.fullName }}</span>
+                        <span class="text-gray-500 text-sm">@{{ comment.author.pseudo }}</span>
+                        <span class="text-gray-500 text-sm">· {{ comment.createdAt|date('d M') }}</span>
+                    </div>
+                    <p class="text-slate-800 text-[15px] leading-normal">{{ comment.content }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Comment Input Trigger (Floating or Fixed Bottom?) -->
+    <!-- We can just rely on the comment button in the partial or add a fixed bottom bar.
+         For now, the user can click the comment bubble in the partial to open the inline form.
+    -->
+</main>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    function toggleCommentForm(postId) {
+        const form = document.getElementById('comment-form-' + postId);
+        form.classList.toggle('hidden');
+    }
+</script>
+{% endblock %}
