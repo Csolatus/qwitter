@@ -59,6 +59,29 @@ class AccueilController extends AbstractController
                 $post->setMediaType('image'); // Simplified for now
             }
 
+            // Gestion du Sondage
+            $pollQuestion = $form->get('pollQuestion')->getData();
+            if (!empty($pollQuestion)) {
+                $poll = new \App\Entity\Poll();
+                $poll->setQuestion($pollQuestion);
+                $poll->setPost($post);
+                $poll->setEndsAt(new \DateTime('+1 day')); // Default 24h duration
+
+                // Options
+                for ($i = 1; $i <= 4; $i++) {
+                    $optionLabel = $form->get('pollOption' . $i)->getData();
+                    if (!empty($optionLabel)) {
+                        $option = new \App\Entity\PollOption();
+                        $option->setLabel($optionLabel);
+                        $poll->addOption($option);
+                    }
+                }
+
+                if ($poll->getOptions()->count() >= 2) {
+                    $entityManager->persist($poll);
+                }
+            }
+
             $entityManager->persist($post);
             $entityManager->flush();
 
