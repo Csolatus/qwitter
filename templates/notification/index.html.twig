@@ -14,8 +14,8 @@
                 <button class="filter-btn active pb-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600 hover:text-blue-700 transition-colors" data-filter="all">
                     All
                 </button>
-                 <button class="filter-btn pb-3 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors" data-filter="mention">
-                    Mentions
+                <button class="filter-btn pb-3 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors" data-filter="replies">
+                    Réponses
                 </button>
                  <button class="filter-btn pb-3 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors" data-filter="follow">
                     Follows
@@ -75,7 +75,7 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    (() => {
         const buttons = document.querySelectorAll('.filter-btn');
         const items = document.querySelectorAll('.notification-item');
 
@@ -103,7 +103,19 @@
 
                 // Filter items
                 items.forEach(item => {
-                    if (filter === 'all' || item.dataset.type === filter) {
+                    const type = item.dataset.type;
+                    let isVisible = false;
+
+                    if (filter === 'all') {
+                        isVisible = true;
+                    } else if (filter === 'replies') {
+                        // Group mentions, comments, and reposts under "Replies"
+                        isVisible = ['mention', 'comment', 'repost'].includes(type);
+                    } else {
+                        isVisible = type === filter;
+                    }
+
+                    if (isVisible) {
                         item.classList.remove('hidden');
                         // Animation reset
                         item.style.animation = 'none';
@@ -115,7 +127,7 @@
                 });
             });
         });
-    });
+    })();
 </script>
 
 <style>
