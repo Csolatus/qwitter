@@ -17,6 +17,7 @@ class HomeController extends AbstractController
         \Symfony\Component\HttpFoundation\Request $request
     ): Response {
         $user = $security->getUser();
+        /** @var \App\Entity\User $user */
 
         if (!$user) {
             return $this->redirectToRoute('app_login');
@@ -44,8 +45,26 @@ class HomeController extends AbstractController
 
         $posts = $postRepository->findBy(['author' => $authors], ['created_at' => 'DESC']);
 
+        // Suggestions: Get 3 users that I'm NOT following and NOT me
+        // Ideally this should be a custom repository method for performance
+        $allUsers = $entityManager->getRepository(\App\Entity\User::class)->findAll();
+        $suggestions = [];
+        $followingIds = array_map(fn($u) => $u->getId(), $following);
+        $followingIds[] = $user->getId();
+
+        foreach ($allUsers as $potentialUser) {
+            if (!in_array($potentialUser->getId(), $followingIds)) {
+                $suggestions[] = $potentialUser;
+            }
+        }
+
+        // Shuffle and take 3
+        shuffle($suggestions);
+        $suggestions = array_slice($suggestions, 0, 3);
+
         return $this->render('home/feed.html.twig', [
-            'posts' => $posts
+            'posts' => $posts,
+            'suggestions' => $suggestions
         ]);
     }
 }
