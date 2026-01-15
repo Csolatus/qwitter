@@ -270,5 +270,24 @@ class Post
 
         return $this;
     }
+    #[ORM\OneToOne(mappedBy: 'post', cascade: ['persist', 'remove'])]
+    private ?Poll $poll = null;
+
+    public function getPoll(): ?Poll
+    {
+        return $this->poll;
+    }
+
+    public function setPoll(Poll $poll): static
+    {
+        // set the owning side of the relation if necessary
+        if ($poll->getPost() !== $this) {
+            $poll->setPost($this);
+        }
+
+        $this->poll = $poll;
+
+        return $this;
+    }
 }
 
