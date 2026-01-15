@@ -17,36 +17,31 @@ class SecurityType extends AbstractType
     {
         $builder
             ->add('currentPassword', PasswordType::class, [
-                    'mapped' => false,
-                    'required' => false,
-                    'label' => 'Mot de passe actuel',
+                'mapped' => false,
+                'required' => false,
+                'label' => 'Mot de passe actuel',
+                'attr' => ['class' => 'w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 outline-none transition-all'],
+                'label_attr' => ['class' => 'block text-sm font-semibold text-slate-700 mb-2'],
+            ])
+            ->add('newPassword', RepeatedType::class, [
+                'type' => PasswordType::class,
+                'mapped' => false,
+                'required' => false,
+                'first_options' => [
+                    'label' => 'Nouveau mot de passe',
                     'attr' => ['class' => 'w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 outline-none transition-all'],
                     'label_attr' => ['class' => 'block text-sm font-semibold text-slate-700 mb-2'],
-                ])
-            ->add('newPassword', RepeatedType::class, [
-                    'type' => PasswordType::class,
-                    'mapped' => false,
-                    'required' => false,
-                    'first_options' => [
-                        'label' => 'Nouveau mot de passe',
-                        'attr' => ['class' => 'w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 outline-none transition-all'],
-                        'label_attr' => ['class' => 'block text-sm font-semibold text-slate-700 mb-2'],
-                    ],
-                    'second_options' => [
-                        'label' => 'Confirmer le nouveau mot de passe',
-                        'attr' => ['class' => 'w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 outline-none transition-all'],
-                        'label_attr' => ['class' => 'block text-sm font-semibold text-slate-700 mb-2'],
-                    ],
-                    'constraints' => [
-                        // new Length(['min' => 6]), // À décommenter si besoin
-                    ],
-                ])
-            ->add('is2FAEnabled', CheckboxType::class, [
-                    'label' => 'Double Authentification (2FA)',
-                    'help' => 'Sécurisez votre compte avec une deuxième étape de connexion',
-                    'required' => false,
-                    'label_attr' => ['class' => 'font-medium text-slate-800'],
-                ])
+                ],
+                'second_options' => [
+                    'label' => 'Confirmer le nouveau mot de passe',
+                    'attr' => ['class' => 'w-full px-4 py-2 rounded-xl border border-gray-200 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 outline-none transition-all'],
+                    'label_attr' => ['class' => 'block text-sm font-semibold text-slate-700 mb-2'],
+                ],
+                'constraints' => [
+                    // new Length(['min' => 6]), // À décommenter si besoin
+                ],
+            ])
+
         ;
     }
 
