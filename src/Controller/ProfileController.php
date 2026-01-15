@@ -44,10 +44,9 @@ class ProfileController extends AbstractController
         $currentUser = $this->getUser();
         $isPrivateAccessDenied = false;
 
-        // Si le compte est privé ET (ce n'est pas moi ET je ne suis pas abonné)
-        if ($user->isPrivate() && $user !== $currentUser && (!$currentUser || !$user->getFollowers()->contains($currentUser))) {
+        if (!$user->canBeViewedBy($currentUser)) {
             $isPrivateAccessDenied = true;
-            $data = []; // On vide les données pour ne rien afficher
+            $data = [];
         } else {
             // Logique de récupération normale
             switch ($tab) {

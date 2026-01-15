@@ -104,6 +104,7 @@ class AccueilController extends AbstractController
 
         // Gestion des onglets "Pour vous" / "Abonnements"
         $feedType = $request->query->get('feed', 'foryou');
+        /** @var \App\Entity\User|null $user */
         $user = $this->getUser();
 
         // Si l'utilisateur n'est pas connecté, on force le mode "foryou"
@@ -112,27 +113,10 @@ class AccueilController extends AbstractController
         }
 
         if ($feedType === 'following' && $user) {
-            /** @var \App\Entity\User $user */
-            $following = $user->getFollowing()->toArray();
-            $authors = array_merge($following, [$user]);
-            // On utilise findBy avec un tableau d'auteurs (Doctrine supporte IN automatiquement)
-            $posts = $postRepo->findBy(['author' => $authors], ['created_at' => 'DESC']);
+            $posts = $postRepo->findFollowingFeed($user);
         } else {
-            // Par défaut ("foryou") : tous les posts
-            // TODO: Optimiser avec une requête SQL custom pour éviter de charger tous les posts et filtrer en PHP
-            $allPosts = $postRepo->findBy([], ['created_at' => 'DESC']);
-            $posts = [];
-
-            foreach ($allPosts as $p) {
-                $author = $p->getAuthor();
-                // On affiche le post si :
-                // 1. L'auteur n'est pas privé
-                // 2. OU c'est moi
-                // 3. OU je suis connecté et je le suis
-                if (!$author->isPrivate() || ($user && ($author === $user || $author->getFollowers()->contains($user)))) {
-                    $posts[] = $p;
-                }
-            }
+            // "Pour vous" (Feed par défaut)
+            $posts = $postRepo->findForYou($user);
         }
 
         // 2. Suggestions (Exclure les abonnements et soi-même)
