@@ -40,4 +40,19 @@ class MessageRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+     /**
+     * Trouve la conversation complète entre deux utilisateurs (messages envoyés ET reçus)
+     */
+    public function findConversation(\App\Entity\User $user1, \App\Entity\User $user2)
+    {
+        return $this->createQueryBuilder('m')
+            ->where('(m.sender = :user1 AND m.receiver = :user2)')
+            ->orWhere('(m.sender = :user2 AND m.receiver = :user1)')
+            ->setParameter('user1', $user1)
+            ->setParameter('user2', $user2)
+            ->orderBy('m.created_at', 'ASC') // ASC pour lire du haut vers le bas (plus ancien au plus récent)
+            ->getQuery()
+            ->getResult();
+    }
 }
+

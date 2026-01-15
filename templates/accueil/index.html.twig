@@ -20,7 +20,7 @@
 
             <!-- Création de Post -->
             <div class="p-4 border-b border-gray-100 pb-2">
-                {{ form_start(form, {'attr': {'class': 'flex gap-4'}}) }}
+                {{ form_start(form, {'action': path('app_accueil'), 'attr': {'class': 'flex gap-4'}}) }}
                     <div class="w-10 h-10 rounded-full bg-slate-200 flex-shrink-0 overflow-hidden">
                         <!-- Avatar Utilisateur Connecté -->
                         {% if app.user and app.user.avatar %}
@@ -56,67 +56,7 @@
             <!-- Fil des Posts -->
             <div class="posts-feed">
                 {% for post in posts %}
-                    <article class="p-4 border-b border-gray-100 hover:bg-gray-50 transition cursor-pointer flex gap-4">
-                        <!-- Avatar Auteur Post -->
-                        <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
-                            {% if post.author.avatar %}
-                                <img src="{{ asset('uploads/avatars/' ~ post.author.avatar) }}" class="w-full h-full object-cover">
-                            {% else %}
-                                <img src="https://ui-avatars.com/api/?name={{ post.author.pseudo }}&background=random" class="w-full h-full object-cover">
-                            {% endif %}
-                        </div>
-                        
-                        <!-- Contenu -->
-                        <div class="flex-1">
-                            <div class="flex justify-between items-start">
-                                <div class="flex items-center gap-1 mb-0.5">
-                                    <span class="font-bold text-slate-900 hover:underline">{{ post.author.fullName }}</span>
-                                    <span class="text-gray-500 text-sm">@{{ post.author.pseudo }}</span>
-                                    <span class="text-gray-500 text-sm">· {{ post.createdAt|date('d M') }}</span>
-                                </div>
-                                <div class="flex gap-2">
-                                     <!-- Delete Button (Only for Author or Admin) -->
-                                    {% if app.user and (post.author == app.user or is_granted('ROLE_ADMIN')) %}
-                                        <form method="post" action="{{ path('app_post_delete', {'id': post.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce post ?');">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
-                                            <button class="text-gray-400 hover:text-red-600 rounded-full p-1 hover:bg-red-50 transition">🗑️</button>
-                                        </form>
-                                    {% endif %}
-                                    <button class="text-gray-400 hover:text-slate-600 rounded-full p-1 hover:bg-blue-50 transition">•••</button>
-                                </div>
-                            </div>
-                            
-                            <p class="text-slate-800 leading-normal text-[15px] whitespace-pre-wrap">{{ post.content }}</p>
-
-                            {% if post.imageFilename %}
-                                <div class="mt-3 rounded-2xl overflow-hidden border border-gray-100 max-h-[400px]">
-                                    <img src="{{ asset('uploads/posts/' ~ post.imageFilename) }}" alt="Post image" class="w-full h-full object-cover">
-                                </div>
-                            {% endif %}
-
-                            <!-- Actions -->
-                            <div class="flex justify-between mt-3 max-w-[350px] text-gray-500">
-                                <button class="flex items-center gap-1 hover:text-blue-500 group text-sm transition">
-                                    <div class="p-1.5 rounded-full group-hover:bg-blue-50 transition">💬</div>
-                                    <span>0</span>
-                                </button>
-                                <button class="flex items-center gap-1 hover:text-green-500 group text-sm transition">
-                                    <div class="p-1.5 rounded-full group-hover:bg-green-50 transition">🔁</div>
-                                    <span>0</span>
-                                </button>
-                                <a href="{{ path('app_post_like', {'id': post.id}) }}" class="flex items-center gap-1 {{ post.likes|filter(l => l.user == app.user)|length > 0 ? 'text-pink-600' : 'hover:text-pink-500' }} group text-sm transition">
-                                    <div class="p-1.5 rounded-full group-hover:bg-pink-50 transition">
-                                        {{ post.likes|filter(l => l.user == app.user)|length > 0 ? '❤️' : '♡' }}
-                                    </div>
-                                    <span>{{ post.likes|length }}</span>
-                                </a>
-                                <button class="flex items-center gap-1 hover:text-blue-500 group text-sm transition">
-                                    <div class="p-1.5 rounded-full group-hover:bg-blue-50 transition">📊</div>
-                                    <span>0</span>
-                                </button>
-                            </div>
-                        </div>
-                    </article>
+                    {% include 'partials/_post.html.twig' with {'post': post} %}
                 {% else %}
                     <!-- État vide -->
                     <div class="py-12 px-8 text-center">
@@ -185,7 +125,10 @@
                                 <div class="text-gray-500 text-xs">@{{ user.pseudo }}</div>
                             </div>
                         </div>
-                        <button class="bg-slate-900 text-white text-xs font-bold px-4 py-1.5 rounded-full hover:bg-slate-700 transition">Suivre</button>
+                        <form action="{{ path('app_follow', {'id': user.id}) }}" method="post" class="flex-shrink-0">
+                            <input type="hidden" name="_token" value="{{ csrf_token('follow' ~ user.id) }}">
+                            <button type="submit" class="bg-slate-900 text-white text-xs font-bold px-4 py-1.5 rounded-full hover:bg-slate-700 transition">Suivre</button>
+                        </form>
                     </div>
                 {% else %}
                     <div class="px-4 py-3 text-sm text-gray-500">Pas encore de suggestions.</div>
@@ -205,4 +148,13 @@
 
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    function toggleCommentForm(postId) {
+        const form = document.getElementById('comment-form-' + postId);
+        form.classList.toggle('hidden');
+    }
+</script>
 {% endblock %}
