@@ -23,14 +23,14 @@ class RegistrationController extends AbstractController
 
         if (!$email || !$plainPassword || !$pseudo) {
             $this->addFlash('error', 'All fields are required.');
-            return $this->redirectToRoute('home');
+            return $this->redirectToRoute('app_login');
         }
 
         // Check if user exists
         $existing = $entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
         if ($existing) {
             $this->addFlash('error', 'Email already in use.');
-            return $this->redirectToRoute('home');
+            return $this->redirectToRoute('app_login');
         }
 
         $user->setEmail($email);

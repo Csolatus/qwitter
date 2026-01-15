@@ -21,8 +21,8 @@
                     <div class="w-5 h-5 {{ app.request.attributes.get('_route') == 'app_message_index' ? 'bg-white/20' : 'bg-gray-200' }} rounded-md group-hover:bg-slate-200 transition-colors"></div>
                     <span class="font-medium">Messages</span>
                 </a>
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:bg-gray-50 hover:text-slate-800 rounded-xl transition-all group">
-                    <div class="w-5 h-5 bg-gray-200 rounded-md group-hover:bg-slate-200 transition-colors"></div>
+                <a href="{{ path('app_notifications') }}" class="flex items-center gap-3 px-4 py-3 {{ app.request.attributes.get('_route') == 'app_notifications' ? 'bg-slate-800 text-white shadow-lg shadow-slate-200' : 'text-gray-500 hover:bg-gray-50 hover:text-slate-800' }} rounded-xl transition-all group">
+                    <div class="w-5 h-5 {{ app.request.attributes.get('_route') == 'app_notifications' ? 'bg-white/20' : 'bg-gray-200' }} rounded-md group-hover:bg-slate-200 transition-colors"></div>
                     <span class="font-medium">Notifications</span>
                 </a>
             </nav>
@@ -49,10 +49,20 @@
                 </a>
             </nav>
 
-            <!-- Bouton Poster / Action -->
-            <button class="mt-8 w-full bg-slate-800 text-white py-3 rounded-xl font-medium shadow-lg shadow-slate-200 hover:bg-slate-900 transition-colors flex items-center justify-center gap-2">
-                <div class="w-4 h-4 bg-white/20 rounded flex items-center justify-center text-xs">+</div>
-                <span>Poster</span>
-            </button>
+            <!-- Bouton Poster / Action (Connecté) -->
+            {% if app.user %}
+                <button class="mt-8 w-full bg-slate-800 text-white py-3 rounded-xl font-medium shadow-lg shadow-slate-200 hover:bg-slate-900 transition-colors flex items-center justify-center gap-2">
+                    <div class="w-4 h-4 bg-white/20 rounded flex items-center justify-center text-xs">+</div>
+                    <span>Poster</span>
+                </button>
+            {% else %}
+                 <!-- Bouton Se Connecter (Invité) -->
+                <a href="{{ path('app_login') }}" class="mt-8 w-full bg-slate-800 text-white py-3 rounded-xl font-medium shadow-lg shadow-slate-200 hover:bg-slate-900 transition-colors flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Se connecter</span>
+                </a>
+            {% endif %}
         </div>
     </aside>
