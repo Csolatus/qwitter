@@ -105,7 +105,20 @@ class AccueilController extends AbstractController
             $posts = $postRepo->findBy(['author' => $authors], ['created_at' => 'DESC']);
         } else {
             // Par défaut ("foryou") : tous les posts
-            $posts = $postRepo->findBy([], ['created_at' => 'DESC']);
+            // TODO: Optimiser avec une requête SQL custom pour éviter de charger tous les posts et filtrer en PHP
+            $allPosts = $postRepo->findBy([], ['created_at' => 'DESC']);
+            $posts = [];
+
+            foreach ($allPosts as $p) {
+                $author = $p->getAuthor();
+                // On affiche le post si :
+                // 1. L'auteur n'est pas privé
+                // 2. OU c'est moi
+                // 3. OU je suis connecté et je le suis
+                if (!$author->isPrivate() || ($user && ($author === $user || $author->getFollowers()->contains($user)))) {
+                    $posts[] = $p;
+                }
+            }
         }
 
         // 2. Suggestions (Exclure les abonnements et soi-même)

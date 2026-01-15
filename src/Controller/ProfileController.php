@@ -40,37 +40,48 @@ class ProfileController extends AbstractController
         $tab = $request->query->get('tab', 'posts');
         $data = [];
 
-        switch ($tab) {
-            case 'likes':
-                $likes = $entityManager->getRepository(\App\Entity\Like::class)->findBy(
-                    ['user' => $user],
-                    ['created_at' => 'DESC']
-                );
-                // On récupère les posts associés aux likes
-                $data = array_map(fn($like) => $like->getPost(), $likes);
-                break;
+        // Vérification de la confidentialité du compte
+        $currentUser = $this->getUser();
+        $isPrivateAccessDenied = false;
 
-            case 'replies':
-                $data = $entityManager->getRepository(\App\Entity\Comment::class)->findBy(
-                    ['author' => $user],
-                    ['created_at' => 'DESC']
-                );
-                break;
+        // Si le compte est privé ET (ce n'est pas moi ET je ne suis pas abonné)
+        if ($user->isPrivate() && $user !== $currentUser && (!$currentUser || !$user->getFollowers()->contains($currentUser))) {
+            $isPrivateAccessDenied = true;
+            $data = []; // On vide les données pour ne rien afficher
+        } else {
+            // Logique de récupération normale
+            switch ($tab) {
+                case 'likes':
+                    $likes = $entityManager->getRepository(\App\Entity\Like::class)->findBy(
+                        ['user' => $user],
+                        ['created_at' => 'DESC']
+                    );
+                    $data = array_map(fn($like) => $like->getPost(), $likes);
+                    break;
 
-            case 'posts':
-            default:
-                $data = $entityManager->getRepository(\App\Entity\Post::class)->findBy(
-                    ['author' => $user],
-                    ['created_at' => 'DESC']
-                );
-                break;
+                case 'replies':
+                    $data = $entityManager->getRepository(\App\Entity\Comment::class)->findBy(
+                        ['author' => $user],
+                        ['created_at' => 'DESC']
+                    );
+                    break;
+
+                case 'posts':
+                default:
+                    $data = $entityManager->getRepository(\App\Entity\Post::class)->findBy(
+                        ['author' => $user],
+                        ['created_at' => 'DESC']
+                    );
+                    break;
+            }
         }
 
         return $this->render('profile/index.html.twig', [
             'user' => $user, // L'utilisateur dont on regarde le profil
             'data' => $data,
             'current_tab' => $tab,
-            'is_me' => $this->getUser() === $user, // Est-ce mon propre profil ?
+            'is_me' => $currentUser === $user, // Est-ce mon propre profil ?
+            'is_private_access_denied' => $isPrivateAccessDenied,
         ]);
     }
 }
