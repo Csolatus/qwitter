@@ -3,60 +3,42 @@
 {% block title %}Mes messages - Qwitter{% endblock %}
 
 {% block body %}
-<div class="flex min-h-screen bg-gray-50">
-    
-    <!-- Sidebar gauche -->
-    <div class="w-64 fixed h-full">
-        {{ include('partial/_sidebar.html.twig') }}
-    </div>
+    <div class="flex-1 bg-white min-h-screen">
+        <!-- Header -->
+        <div class="sticky top-0 bg-white/80 backdrop-blur-md border-b border-gray-200 p-4 z-10">
+            <h2 class="text-xl font-bold text-gray-900">Messages privés</h2>
+        </div>
 
-    <!-- Contenu central avec marge à gauche -->
-    <div class="ml-64 flex w-full">
-        
-        <div class="flex-1 border-r border-gray-200 bg-white min-h-screen">
-            <!-- Header -->
-            <div class="sticky top-0 bg-white/80 backdrop-blur-md border-b border-gray-200 p-4 z-10">
-                <h2 class="text-xl font-bold text-gray-900">Messages privés</h2>
-            </div>
-
-            <!-- Liste des messages -->
-            <div class="p-0">
-                {% if messages is empty %}
-                    <div class="p-8 text-center text-gray-500">
-                        <p>Vous n'avez aucun message privé.</p>
-                    </div>
-                {% else %}
-                    {% for message in messages %}
-                        <!-- Item message -->
-                        <div class="border-b border-gray-100 p-4 hover:bg-gray-50 transition cursor-pointer flex gap-3">
-                            <!-- Avatar -->
-                            <div class="w-12 h-12 bg-slate-200 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-slate-600">
-                                {# Utilise |first pour la première lettre du pseudo #}
-                                {{ message.sender.username|first|upper }}
-                            </div>
-                            
-                            <!-- Contenu -->
-                            <div class="flex-1">
-                                <div class="flex justify-between items-baseline mb-1">
-                                    <span class="font-bold text-gray-900">{{ message.sender.username }}</span>
-                                    {# Utilise createdAt (le getter getCreatedAt()) #}
-                                    <span class="text-sm text-gray-500">{{ message.createdAt|date('d M H:i') }}</span>
-                                </div>
-                                <p class="text-gray-600 line-clamp-2">
-                                    {{ message.content }}
-                                </p>
-                            </div>
+        <!-- Liste des messages -->
+        <div class="p-0">
+            {% if messages is empty %}
+                <div class="p-8 text-center text-gray-500">
+                    <p>Vous n'avez aucun message privé.</p>
+                </div>
+            {% else %}
+                {% for message in messages %}
+                    <!-- Item message -->
+                    <div class="border-b border-gray-100 p-4 hover:bg-gray-50 transition cursor-pointer flex gap-3">
+                        <!-- Avatar -->
+                        <div class="w-12 h-12 bg-slate-200 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-slate-600">
+                            {# Utilise |first pour la première lettre du pseudo #}
+                            {{ message.sender.username|first|upper }}
                         </div>
-                    {% endfor %}
-                {% endif %}
-            </div>
+                        
+                        <!-- Contenu -->
+                        <div class="flex-1">
+                            <div class="flex justify-between items-baseline mb-1">
+                                <span class="font-bold text-gray-900">{{ message.sender.username }}</span>
+                                {# Utilise createdAt (le getter getCreatedAt()) #}
+                                <span class="text-sm text-gray-500">{{ message.createdAt|date('d M H:i') }}</span>
+                            </div>
+                            <p class="text-gray-600 line-clamp-2">
+                                {{ message.content }}
+                            </p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
-
-        <!-- Colonne droite (vide ou suggestions) -->
-        <div class="w-80 hidden lg:block p-4">
-            <!-- Espace libre pour future intégration -->
-        </div>
-
     </div>
-</div>
 {% endblock %}
