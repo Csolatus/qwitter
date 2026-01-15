@@ -24,8 +24,10 @@ class NotificationController extends AbstractController
         );
 
         // Mark as read
+        $unreadNotificationIds = [];
         foreach ($notifications as $notification) {
             if (!$notification->isRead()) {
+                $unreadNotificationIds[] = $notification->getId();
                 $notification->setIsRead(true);
             }
         }
@@ -36,6 +38,7 @@ class NotificationController extends AbstractController
 
         return $this->render('notification/index.html.twig', [
             'notifications' => $notifications,
+            'unreadNotificationIds' => $unreadNotificationIds,
         ]);
     }
 }

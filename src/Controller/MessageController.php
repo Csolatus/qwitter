@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Message;
+use App\Entity\Notification;
 use App\Entity\User;
 use App\Form\MessageType;
 use App\Repository\MessageRepository;
@@ -24,13 +25,13 @@ class MessageController extends AbstractController
     public function index(
         MessageRepository $messageRepository,
         UserRepository $userRepository,
-        Request $request, 
+        Request $request,
         EntityManagerInterface $em,
         ?User $otherUser = null // L'utilisateur avec qui on parle (optionnel)
-    ): Response
-    {
+    ): Response {
         $user = $this->getUser();
-        if (!$user) return $this->redirectToRoute('app_login');
+        if (!$user)
+            return $this->redirectToRoute('app_login');
 
         // 1. Gestion de l'envoi de message
         $message = new Message();
@@ -48,6 +49,16 @@ class MessageController extends AbstractController
             }
 
             $em->persist($message);
+
+            // Créer une notification
+            $notification = new Notification();
+            $notification->setUser($message->getReceiver());
+            $notification->setActor($user);
+            $notification->setType('message');
+            $notification->setMessage('vous a envoyé un message');
+            $notification->setRelatedId($message->getId());
+            $notification->setIsRead(false);
+            $em->persist($notification);
             $em->flush();
 
             // Redirection vers la conversation pour voir le message envoyé
@@ -55,16 +66,38 @@ class MessageController extends AbstractController
         }
 
         // 2. Récupération des données pour la vue
-        
-        // Liste de TOUS les utilisateurs (pour la sidebar de gauche)
-        // Dans le futur, tu pourras filtrer pour ne montrer que les "amis" ou "ceux avec qui j'ai parlé"
-        $users = $userRepository->findAll();
+
+        // 2. Récupération des données pour la vue
+
+        // Contacts récents (avec métadonnées et triés par date)
+        $recentContacts = $messageRepository->findRecentContacts($user);
+
+        // Tous les utilisateurs (pour combler la liste avec ceux à qui on n'a jamais parlé)
+        $allUsers = $userRepository->findAll();
+
+        // Créer un tableau des IDs déjà présents pour éviter les doublons
+        $existingIds = [];
+        foreach ($recentContacts as $contact) {
+            $existingIds[] = $contact['user']->getId();
+        }
+
+        // Fusionner : on garde les récents en premier, on ajoute les autres à la fin
+        $finalUsersList = $recentContacts;
+        foreach ($allUsers as $u) {
+            if ($u !== $user && !in_array($u->getId(), $existingIds)) {
+                $finalUsersList[] = [
+                    'user' => $u,
+                    'unreadCount' => 0,
+                    'lastMessageAt' => null
+                ];
+            }
+        }
 
         // Si un utilisateur est sélectionné, on charge la conversation
         $conversation = [];
         if ($otherUser) {
             $conversation = $messageRepository->findConversation($user, $otherUser);
-            
+
             // Marquer les messages comme "lus" (optionnel mais cool)
             foreach ($conversation as $msg) {
                 if ($msg->getReceiver() === $user && !$msg->isRead()) {
@@ -77,7 +110,7 @@ class MessageController extends AbstractController
 
         return $this->render('messages/index.html.twig', [
             'form' => $form->createView(),
-            'users' => $users,           // Pour la liste de gauche
+            'users' => $finalUsersList,           // Pour la liste de gauche
             'conversation' => $conversation, // Les messages de la conversation active
             'otherUser' => $otherUser,   // L'utilisateur avec qui on parle
         ]);
@@ -85,11 +118,10 @@ class MessageController extends AbstractController
 
     #[Route('/messages/delete/{id}', name: 'app_message_delete', methods: ['POST'])]
     public function delete(
-        Message $message, 
+        Message $message,
         EntityManagerInterface $em,
         Request $request
-    ): Response
-    {
+    ): Response {
         $user = $this->getUser();
 
         // Sécurité
@@ -97,7 +129,7 @@ class MessageController extends AbstractController
             throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer ce message.');
         }
 
-        if ($this->isCsrfTokenValid('delete'.$message->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $message->getId(), $request->request->get('_token'))) {
             $em->remove($message);
             $em->flush();
         }
@@ -105,8 +137,8 @@ class MessageController extends AbstractController
         // Redirection intelligente : on reste sur la conversation en cours
         // Si j'ai envoyé le message, je veux retourner voir le destinataire
         // Si j'ai reçu le message, je veux retourner voir l'expéditeur
-        $redirectUserId = ($message->getSender() === $user) 
-            ? $message->getReceiver()->getId() 
+        $redirectUserId = ($message->getSender() === $user)
+            ? $message->getReceiver()->getId()
             : $message->getSender()->getId();
 
         return $this->redirectToRoute('app_message_show', ['id' => $redirectUserId]);
