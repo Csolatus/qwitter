@@ -38,8 +38,11 @@ class HomeController extends AbstractController
             }
         }
 
-        // Fetch posts
-        $posts = $postRepository->findBy([], ['created_at' => 'DESC']);
+        // Fetch posts from self and followed users
+        $following = $user->getFollowing()->toArray();
+        $authors = array_merge($following, [$user]);
+
+        $posts = $postRepository->findBy(['author' => $authors], ['created_at' => 'DESC']);
 
         return $this->render('home/feed.html.twig', [
             'posts' => $posts
