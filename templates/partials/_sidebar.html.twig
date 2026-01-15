@@ -1,11 +1,15 @@
     <!-- Sidebar (Navigation) -->
     <aside class="w-64 bg-white border-r border-gray-200 flex flex-col justify-between fixed h-full z-10">
         <div class="p-6">
-            <!-- Logo -->
-            <div class="mb-8 flex items-center gap-3">
-                <div class="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-white font-bold">Q</div>
+            <!-- Logo Image Optimisé -->
+            <a href="{{ path('app_accueil') }}" class="mb-8 flex items-center gap-3 px-2 hover:opacity-80 transition-opacity">
+                <!-- Image du logo -->
+                <img src="{{ asset('logo/Logo_Qwitter.png') }}" 
+                     alt="Logo Qwitter" 
+                     class="w-10 h-10 object-contain rounded-lg">
+                
+                <!-- Nom du site -->
                 <span class="text-xl font-bold tracking-tight text-slate-800">Qwitter</span>
-            </div>
 
             <!-- Menu Principal -->
             <nav class="space-y-1">
