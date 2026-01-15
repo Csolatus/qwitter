@@ -14,8 +14,8 @@ Ce projet utilise une stack moderne basée sur Symfony 8 et PHP 8.2+.
 
 ### Frontend
 *   **Gestionnaire d'assets** : Symfony AssetMapper (pas de Node.js/Webpack requis)
-*   **JavaScript** : [Stimulus](https://stimulus.hotwired.dev/) & [Turbo](https://turbo.hotwired.dev/)
-*   **CSS** : TailwindCSS (via CDN ou intégré)
+*   **JavaScript**
+*   **CSS**
 
 ### Infrastructure & Outils
 *   **Conteneurisation** : Docker & Docker Compose
