@@ -94,6 +94,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->likes = new ArrayCollection();
         $this->messages = new ArrayCollection();
         $this->notifications = new ArrayCollection();
+        $this->following = new ArrayCollection();
+        $this->followers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -429,6 +431,75 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @var Collection<int, self>
+     */
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'followers')]
+    #[ORM\JoinTable(name: 'user_following')]
+    private Collection $following;
+
+    /**
+     * @var Collection<int, self>
+     */
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'following')]
+    private Collection $followers;
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getFollowing(): Collection
+    {
+        return $this->following;
+    }
+
+    public function addFollowing(self $user): static
+    {
+        if (!$this->following->contains($user)) {
+            $this->following->add($user);
+        }
+
+        return $this;
+    }
+
+    public function removeFollowing(self $user): static
+    {
+        $this->following->removeElement($user);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getFollowers(): Collection
+    {
+        return $this->followers;
+    }
+
+    public function addFollower(self $user): static
+    {
+        if (!$this->followers->contains($user)) {
+            $this->followers->add($user);
+            $user->addFollowing($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFollower(self $user): static
+    {
+        if ($this->followers->removeElement($user)) {
+            $user->removeFollowing($this);
+        }
+
+        return $this;
+    }
+
+    public function isFollowing(self $user): bool
+    {
+        return $this->following->contains($user);
     }
 
     /**

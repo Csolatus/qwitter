@@ -34,10 +34,18 @@
                                 Éditer le profil
                             </a>
                         {% else %}
-                             {# TODO: Bouton Suivre #}
-                            <button class="px-6 py-2 bg-slate-800 text-white font-semibold rounded-full hover:bg-slate-900 transition-colors shadow-lg shadow-slate-200">
-                                Suivre
-                            </button>
+                            <form action="{{ path('app_follow', {'id': user.id}) }}" method="post">
+                                {% if app.user.isFollowing(user) %}
+                                    <button type="submit" class="group px-6 py-2 border border-gray-300 text-slate-900 font-semibold rounded-full hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all">
+                                        <span class="group-hover:hidden">Abonné</span>
+                                        <span class="hidden group-hover:inline">Se désabonner</span>
+                                    </button>
+                                {% else %}
+                                    <button type="submit" class="px-6 py-2 bg-slate-800 text-white font-semibold rounded-full hover:bg-slate-900 transition-colors shadow-lg shadow-slate-200">
+                                        Suivre
+                                    </button>
+                                {% endif %}
+                            </form>
                         {% endif %}
                     </div>
                 </div>
@@ -57,11 +65,11 @@
 
                     <div class="flex items-center gap-6 text-gray-500 text-sm">
                         <div class="flex items-center gap-1">
-                            <span class="text-slate-900 font-bold">142</span>
+                            <span class="text-slate-900 font-bold">{{ user.following|length }}</span>
                             <span>abonnements</span>
                         </div>
                         <div class="flex items-center gap-1">
-                            <span class="text-slate-900 font-bold">1,2k</span>
+                            <span class="text-slate-900 font-bold">{{ user.followers|length }}</span>
                             <span>abonnés</span>
                         </div>
                          <div class="flex items-center gap-1">
