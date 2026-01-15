@@ -1,0 +1,26 @@
+{# templates/partials/_avatar.html.twig #}
+{# 
+    Arguments:
+    - user: User entity (required)
+    - size: CSS classes for width/height (default: 'w-10 h-10')
+    - class: Additional CSS classes (optional)
+#}
+
+{% set size = size|default('w-10 h-10') %}
+{% set extra_classes = class|default('') %}
+
+<div class="{{ size }} rounded-full bg-slate-200 flex-shrink-0 overflow-hidden {{ extra_classes }}">
+    {% if user and user.avatar %}
+        <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="{{ user.pseudo }}" class="w-full h-full object-cover">
+    {% elseif user %}
+        {# Fallback: UI Avatars Service #}
+        <img src="https://ui-avatars.com/api/?name={{ user.pseudo }}&background=0f172a&color=fff" alt="{{ user.pseudo }}" class="w-full h-full object-cover">
+    {% else %}
+        {# Fallback: Anonymous/Deleted User #}
+        <div class="w-full h-full bg-slate-400 flex items-center justify-center text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-1/2 h-1/2" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+            </svg>
+        </div>
+    {% endif %}
+</div>

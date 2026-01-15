@@ -18,11 +18,7 @@
                     <div class="relative">
                         <div class="w-32 h-32 bg-white rounded-full p-1 shadow-lg">
                             <div class="w-full h-full bg-slate-100 rounded-full flex items-center justify-center overflow-hidden">
-                                {% if user.avatar %}
-                                    <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="{{ user.pseudo }}" class="w-full h-full object-cover">
-                                {% else %}
-                                    <span class="text-4xl">👤</span>
-                                {% endif %}
+                                {% include 'partials/_avatar.html.twig' with {'user': user, 'size': 'w-full h-full'} %}
                             </div>
                         </div>
                     </div>
@@ -111,11 +107,7 @@
                     {% for comment in data %}
                         <div class="p-4 border-b border-gray-100 hover:bg-gray-50 transition flex gap-4 bg-white">
                              <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden">
-                                {% if comment.author.avatar %}
-                                    <img src="{{ asset('uploads/avatars/' ~ comment.author.avatar) }}" class="w-full h-full object-cover">
-                                {% else %}
-                                    <img src="https://ui-avatars.com/api/?name={{ comment.author.pseudo }}&background=random" class="w-full h-full object-cover">
-                                {% endif %}
+                                {% include 'partials/_avatar.html.twig' with {'user': comment.author, 'size': 'w-full h-full'} %}
                             </div>
                             <div class="flex-1">
                                 <div class="flex items-center gap-2 mb-1">

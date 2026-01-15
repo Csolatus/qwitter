@@ -18,11 +18,7 @@
             </div>
         {% endif %}
         <div class="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0 overflow-hidden relative z-10" onclick="event.stopPropagation(); window.location='{{ path('app_profile', {'slug': displayPost.author.slug}) }}'">
-            {% if displayPost.author.avatar %}
-                <img src="{{ asset('uploads/avatars/' ~ displayPost.author.avatar) }}" class="w-full h-full object-cover">
-            {% else %}
-                <img src="https://ui-avatars.com/api/?name={{ displayPost.author.pseudo }}&background=random" class="w-full h-full object-cover">
-            {% endif %}
+            {% include 'partials/_avatar.html.twig' with {'user': displayPost.author, 'size': 'w-full h-full'} %}
         </div>
     </div>
     

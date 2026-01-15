@@ -1,5 +1,5 @@
     <!-- Sidebar (Navigation) -->
-    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col justify-between fixed h-full z-10">
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col fixed h-full z-10">
         <div class="p-6">
             <!-- Logo Image Optimisé -->
             <a href="{{ path('app_accueil') }}" class="mb-8 flex items-center gap-3 px-2 hover:opacity-80 transition-opacity">
@@ -52,7 +52,7 @@
             </nav>
         </div>
 
-        <div class="p-6">
+        <div class="p-6 mt-24">
             <!-- Séparateur -->
             <div class="h-px bg-gray-100 mb-6"></div>
 
@@ -84,21 +84,6 @@
             </nav>
 
             <!-- Bouton Poster / Action (Connecté) -->
-            {% if app.user %}
-                <button class="mt-8 w-full bg-slate-800 text-white py-3 rounded-xl font-medium shadow-lg shadow-slate-200 hover:bg-slate-900 transition-colors flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                    </svg>
-                    <span>Poster</span>
-                </button>
-            {% else %}
-                 <!-- Bouton Se Connecter (Invité) -->
-                <a href="{{ path('app_login') }}" class="mt-8 w-full bg-slate-800 text-white py-3 rounded-xl font-medium shadow-lg shadow-slate-200 hover:bg-slate-900 transition-colors flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                    <span>Se connecter</span>
-                </a>
-            {% endif %}
+
         </div>
     </aside>
