@@ -14,8 +14,23 @@
         <main class="flex-1 max-w-[600px] w-full border-r border-gray-100 min-h-screen">
             
             <!-- Header Sticky -->
-            <div class="bg-white/90 backdrop-blur-md px-4 py-3 border-b border-gray-100 cursor-pointer">
-                <h1 class="text-xl font-bold text-slate-800">Accueil</h1>
+            <div class="sticky top-0 z-20 bg-white/90 backdrop-blur-md border-b border-gray-100 flex">
+                <a href="{{ path('app_accueil', {'feed': 'foryou'}) }}" class="flex-1 flex justify-center items-center hover:bg-gray-100 transition py-4">
+                    <div class="relative">
+                        <span class="{{ (current_feed is not defined or current_feed == 'foryou') ? 'font-bold text-slate-900' : 'font-medium text-gray-500' }}">Pour vous</span>
+                        {% if current_feed is not defined or current_feed == 'foryou' %}
+                            <div class="absolute -bottom-4 left-0 right-0 h-1 bg-slate-800 rounded-full"></div>
+                        {% endif %}
+                    </div>
+                </a>
+                <a href="{{ path('app_accueil', {'feed': 'following'}) }}" class="flex-1 flex justify-center items-center hover:bg-gray-100 transition py-4">
+                    <div class="relative">
+                        <span class="{{ (current_feed is defined and current_feed == 'following') ? 'font-bold text-slate-900' : 'font-medium text-gray-500' }}">Abonnements</span>
+                        {% if current_feed is defined and current_feed == 'following' %}
+                            <div class="absolute -bottom-4 left-0 right-0 h-1 bg-slate-800 rounded-full"></div>
+                        {% endif %}
+                    </div>
+                </a>
             </div>
 
             <!-- Création de Post -->

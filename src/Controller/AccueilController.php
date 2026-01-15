@@ -64,17 +64,33 @@ class AccueilController extends AbstractController
             return $this->redirectToRoute('app_accueil');
         }
 
-        // 1. Récupère tous les posts triés par date décroissante (les plus récents en premier)
-        $posts = $postRepo->findBy([], ['created_at' => 'DESC']);
+        // Gestion des onglets "Pour vous" / "Abonnements"
+        $feedType = $request->query->get('feed', 'foryou');
+        $user = $this->getUser();
+
+        if ($feedType === 'following' && $user) {
+            // Récupérer les ID des utilisateurs suivis
+            $followedIds = [];
+            foreach ($user->getFollowing() as $followedUser) {
+                $followedIds[] = $followedUser->getId();
+            }
+            // Ajouter l'ID de l'utilisateur courant pour voir aussi ses propres posts
+            $followedIds[] = $user->getId();
+
+            $posts = $postRepo->findByAuthors($followedIds);
+        } else {
+            // Par défaut ("foryou") ou si non connecté : tous les posts
+            $posts = $postRepo->findBy([], ['created_at' => 'DESC']);
+        }
 
         // 2. Récupère 3 utilisateurs au hasard ou les derniers inscrits pour les suggestions
-        // (Tu pourras améliorer cette logique plus tard pour exclure l'utilisateur courant)
         $suggestions = $userRepo->findBy([], ['created_at' => 'DESC'], 3);
 
         return $this->render('accueil/index.html.twig', [
             'posts' => $posts,
             'suggestions' => $suggestions,
             'form' => $form->createView(),
+            'current_feed' => $feedType,
         ]);
     }
 }
