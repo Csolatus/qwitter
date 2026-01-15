@@ -23,7 +23,7 @@ class ContactController extends AbstractController
 
             $email = (new Email())
                 ->from($data['email'])
-                ->to('admin@votre-entreprise.com') // REMPLACEZ PAR VOTRE EMAIL
+                ->to('contact@qwitter.com')
                 ->subject('Nouveau contact : ' . $data['subject'])
                 ->text(
                     "Expéditeur : {$data['name']} <{$data['email']}>\n\n" .

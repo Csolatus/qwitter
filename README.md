@@ -14,8 +14,8 @@ Ce projet utilise une stack moderne basée sur Symfony 8 et PHP 8.2+.
 
 ### Frontend
 *   **Gestionnaire d'assets** : Symfony AssetMapper (pas de Node.js/Webpack requis)
-*   **JavaScript** : [Stimulus](https://stimulus.hotwired.dev/) & [Turbo](https://turbo.hotwired.dev/)
-*   **CSS** : TailwindCSS (via CDN ou intégré)
+*   **JavaScript**
+*   **CSS**
 
 ### Infrastructure & Outils
 *   **Conteneurisation** : Docker & Docker Compose
@@ -43,3 +43,10 @@ Suivez ces étapes pour installer et lancer le projet localement.
     ```bash
     docker-compose up -d --build
     ```
+    puis effectuer les 3 commandes suivantes pour les migrations
+    ```bash
+    docker exec -t qwitter-php-1 composer install
+    docker exec -t qwitter-php-1 php bin/console doctrine:migrations:migrate --no-interaction
+    docker exec -t qwitter-php-1 php bin/console doctrine:fixtures:load --no-interaction
+    ```
+   
