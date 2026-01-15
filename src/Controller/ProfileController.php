@@ -35,8 +35,15 @@ class ProfileController extends AbstractController
             }
         }
 
+        // Récupérer les posts de l'utilisateur triés par date décroissante
+        $posts = $entityManager->getRepository(\App\Entity\Post::class)->findBy(
+            ['author' => $user],
+            ['created_at' => 'DESC']
+        );
+
         return $this->render('profile/index.html.twig', [
             'user' => $user, // L'utilisateur dont on regarde le profil
+            'posts' => $posts,
             'is_me' => $this->getUser() === $user, // Est-ce mon propre profil ?
         ]);
     }
