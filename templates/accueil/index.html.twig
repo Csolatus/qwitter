@@ -13,6 +13,14 @@
         <!-- COLONNE 2 : FIL D'ACTUALITÉ -->
         <main class="flex-1 max-w-[600px] w-full border-r border-gray-100 min-h-screen">
             
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="px-4 py-3 {{ label == 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }} border-b border-white">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
             <!-- Header Sticky -->
             <div class="sticky top-0 z-20 bg-white backdrop-blur-md border-b border-gray-100 flex">
                 <a href="{{ path('app_accueil', {'feed': 'foryou'}) }}" class="flex-1 flex justify-center items-center hover:bg-gray-100 transition py-4">
