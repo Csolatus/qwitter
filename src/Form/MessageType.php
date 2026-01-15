@@ -17,19 +17,19 @@ class MessageType extends AbstractType
     {
         $builder
             ->add('receiver', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'username',
-                'label' => 'Destinataire',
-                'attr' => ['class' => 'w-full p-2 border rounded mb-3']
-            ])
+                    'class' => User::class,
+                    'choice_label' => 'pseudo',
+                    'label' => 'Destinataire',
+                    'attr' => ['class' => 'w-full p-2 border rounded mb-3']
+                ])
             ->add('content', TextareaType::class, [
-                'label' => 'Message',
-                'attr' => ['class' => 'w-full p-2 border rounded mb-3', 'rows' => 4]
-            ])
+                    'label' => 'Message',
+                    'attr' => ['class' => 'w-full p-2 border rounded mb-3', 'rows' => 4]
+                ])
             ->add('send', SubmitType::class, [
-                'label' => 'Envoyer',
-                'attr' => ['class' => 'px-4 py-2 bg-slate-800 text-white rounded hover:bg-slate-700']
-            ])
+                    'label' => 'Envoyer',
+                    'attr' => ['class' => 'px-4 py-2 bg-slate-800 text-white rounded hover:bg-slate-700']
+                ])
         ;
     }
 

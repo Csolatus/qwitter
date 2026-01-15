@@ -26,11 +26,11 @@
                 <div class="border border-gray-200 rounded-lg p-4 mb-3 hover:bg-gray-50 transition relative group">
                     <div class="flex items-start gap-3">
                         <div class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-white font-bold">
-                            {{ message.sender.username|first|upper }}
+                            {{ message.sender.pseudo|first|upper }}
                         </div>
                         <div class="flex-1">
                             <div class="flex justify-between">
-                                <span class="font-bold">{{ message.sender.username }}</span>
+                                <span class="font-bold">{{ message.sender.pseudo }}</span>
                                 <span class="text-xs text-gray-500">{{ message.createdAt|date('d/m/Y H:i') }}</span>
                             </div>
                             <p class="text-gray-700 mt-1">{{ message.content }}</p>
