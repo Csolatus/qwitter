@@ -7,19 +7,14 @@
     
     <div class="flex w-full max-w-[1300px]"> <!-- Largeur max standard Twitter -->
 
-        <!-- COLONNE 1 : SIDEBAR -->
-        <!-- On réserve l'espace de 64 (256px) pour la sidebar fixe -->
-        <div class="w-64 flex-shrink-0 relative hidden md:block">
-            <!-- Inclusion de ta sidebar existante -->
-            {{ include('partial/_sidebar.html.twig') }}
-        </div>
+
 
 
         <!-- COLONNE 2 : FIL D'ACTUALITÉ -->
         <main class="flex-1 max-w-[600px] w-full border-r border-gray-100 min-h-screen">
             
             <!-- Header Sticky -->
-            <div class="sticky top-0 bg-white/90 backdrop-blur-md z-20 px-4 py-3 border-b border-gray-100 cursor-pointer">
+            <div class="bg-white/90 backdrop-blur-md px-4 py-3 border-b border-gray-100 cursor-pointer">
                 <h1 class="text-xl font-bold text-slate-800">Accueil</h1>
             </div>
 
