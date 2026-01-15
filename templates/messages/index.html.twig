@@ -4,17 +4,17 @@
 
 {% block body %}
 <!-- 
-    On utilise h-[calc(100vh-theme(spacing.16))] ou h-screen selon ton header. 
-    Ici je mets h-screen avec overflow-hidden pour que seul le chat scrolle.
+    Structure principale sans double scrollbar
+    h-screen et overflow-hidden permettent de gérer le scroll uniquement dans la zone de chat
 -->
 <div class="flex h-screen bg-white overflow-hidden relative">
 
-    <!-- J'ai SUPPRIMÉ la sidebar ici car elle est déjà dans 'base.html.twig' -->
+    <!-- Pas de sidebar ici car elle est déjà incluse dans base.html.twig -->
 
-    <!-- ZONE DE MESSAGERIE (Prend toute la largeur restante) -->
+    <!-- ZONE DE MESSAGERIE GLOBALE -->
     <div class="flex flex-1 h-full relative">
         
-        <!-- COLONNE GAUCHE : LISTE DES CONTACTS (Largeur fixe 80 ou 320px) -->
+        <!-- COLONNE GAUCHE : LISTE DES CONTACTS (Largeur fixe) -->
         <div class="w-full md:w-80 border-r border-gray-200 flex flex-col bg-white z-10">
             
             <!-- En-tête "Discussions" + Bouton Nouveau Message -->
@@ -124,10 +124,15 @@
                     <div id="scroll-anchor"></div>
                 </div>
 
-                <!-- ZONE DE SAISIE -->
+                <!-- ZONE DE SAISIE CORRIGÉE (Sans double bouton) -->
                 <div class="p-4 border-t border-gray-200 bg-white">
                     {{ form_start(form, {'attr': {'class': 'flex gap-3 items-end'}}) }}
+                        
+                        <!-- IMPORTANT : On affiche manuellement le token CSRF car render_rest est false -->
+                        {{ form_row(form._token) }}
+                        
                         <div class="hidden">{{ form_row(form.receiver) }}</div>
+                        
                         <div class="flex-1 relative">
                             {{ form_widget(form.content, {'attr': {
                                 'class': 'w-full border-0 bg-gray-100 rounded-3xl px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-800 resize-none overflow-hidden max-h-32',
@@ -136,12 +141,16 @@
                                 'oninput': 'this.style.height = ""; this.style.height = this.scrollHeight + "px"'
                             }}) }}
                         </div>
+                        
+                        <!-- Bouton d'envoi unique -->
                         <button type="submit" class="bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 transition shadow-lg">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 translate-x-0.5 -translate-y-0.5">
                                 <path d="M3.478 2.405a.75.75 0 00-.926.94l2.432 7.905H13.5a.75.75 0 010 1.5H4.984l-2.432 7.905a.75.75 0 00.926.94 60.519 60.519 0 0018.445-8.986.75.75 0 000-1.218A60.517 60.517 0 003.478 2.405z" />
                             </svg>
                         </button>
-                    {{ form_end(form) }}
+
+                    <!-- render_rest: false empêche Symfony d'afficher son propre bouton "Submit" -->
+                    {{ form_end(form, {'render_rest': false}) }}
                 </div>
 
             {% else %}
@@ -158,7 +167,7 @@
     </div>
 </div>
 
-<!-- MODALE NOUVEAU MESSAGE (Toujours présente dans le code, cachée par CSS) -->
+<!-- MODALE NOUVEAU MESSAGE -->
 <div id="new-chat-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" onclick="toggleModal('new-chat-modal')"></div>
     <div class="fixed inset-0 z-10 overflow-y-auto">
