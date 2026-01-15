@@ -35,7 +35,7 @@
 
             <!-- Création de Post -->
             <div class="p-4 border-b border-gray-100 pb-2">
-                {{ form_start(form, {'attr': {'class': 'flex gap-4'}}) }}
+                {{ form_start(form, {'action': path('app_accueil'), 'attr': {'class': 'flex gap-4'}}) }}
                     <div class="w-10 h-10 rounded-full bg-slate-200 flex-shrink-0 overflow-hidden">
                         <!-- Avatar Utilisateur Connecté -->
                         {% if app.user and app.user.avatar %}
