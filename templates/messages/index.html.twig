@@ -3,60 +3,53 @@
 {% block title %}Mes messages - Qwitter{% endblock %}
 
 {% block body %}
-<div class="flex min-h-screen bg-gray-50">
-    
-    <!-- Sidebar gauche -->
-    <div class="w-64 fixed h-full">
-        {{ include('partial/_sidebar.html.twig') }}
-    </div>
+<div class="flex w-full min-h-screen bg-gray-50">
+    <div class="flex-1 border-r border-gray-200 bg-white min-h-screen p-6">
+            
+            <h2 class="text-2xl font-bold mb-6">Messagerie</h2>
 
-    <!-- Contenu central avec marge à gauche -->
-    <div class="ml-64 flex w-full">
-        
-        <div class="flex-1 border-r border-gray-200 bg-white min-h-screen">
-            <!-- Header -->
-            <div class="sticky top-0 bg-white/80 backdrop-blur-md border-b border-gray-200 p-4 z-10">
-                <h2 class="text-xl font-bold text-gray-900">Messages privés</h2>
+            <!-- Formulaire d'envoi (Nouveau Message) -->
+            <div class="bg-gray-100 p-4 rounded-xl mb-8">
+                <h3 class="font-bold mb-3">Nouveau message</h3>
+                {{ form_start(form) }}
+                    {{ form_row(form.receiver) }}
+                    {{ form_row(form.content) }}
+                    {{ form_row(form.send) }}
+                {{ form_end(form) }}
             </div>
 
             <!-- Liste des messages -->
-            <div class="p-0">
-                {% if messages is empty %}
-                    <div class="p-8 text-center text-gray-500">
-                        <p>Vous n'avez aucun message privé.</p>
-                    </div>
-                {% else %}
-                    {% for message in messages %}
-                        <!-- Item message -->
-                        <div class="border-b border-gray-100 p-4 hover:bg-gray-50 transition cursor-pointer flex gap-3">
-                            <!-- Avatar -->
-                            <div class="w-12 h-12 bg-slate-200 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-slate-600">
-                                {# Utilise |first pour la première lettre du pseudo #}
-                                {{ message.sender.username|first|upper }}
-                            </div>
-                            
-                            <!-- Contenu -->
-                            <div class="flex-1">
-                                <div class="flex justify-between items-baseline mb-1">
-                                    <span class="font-bold text-gray-900">{{ message.sender.username }}</span>
-                                    {# Utilise createdAt (le getter getCreatedAt()) #}
-                                    <span class="text-sm text-gray-500">{{ message.createdAt|date('d M H:i') }}</span>
-                                </div>
-                                <p class="text-gray-600 line-clamp-2">
-                                    {{ message.content }}
-                                </p>
-                            </div>
+            <h3 class="font-bold mb-4 text-xl">Reçus récemment</h3>
+            
+            {% for message in messages %}
+                <div class="border border-gray-200 rounded-lg p-4 mb-3 hover:bg-gray-50 transition relative group">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-white font-bold">
+                            {{ message.sender.username|first|upper }}
                         </div>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <span class="font-bold">{{ message.sender.username }}</span>
+                                <span class="text-xs text-gray-500">{{ message.createdAt|date('d/m/Y H:i') }}</span>
+                            </div>
+                            <p class="text-gray-700 mt-1">{{ message.content }}</p>
+                        </div>
+                    </div>
 
-        <!-- Colonne droite (vide ou suggestions) -->
-        <div class="w-80 hidden lg:block p-4">
-            <!-- Espace libre pour future intégration -->
-        </div>
-
+                    <!-- Bouton Supprimer (visible au survol) -->
+                    <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition">
+                        <form method="post" action="{{ path('app_message_delete', {'id': message.id}) }}" onsubmit="return confirm('Supprimer ce message ?');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ message.id) }}">
+                            <button class="text-red-500 hover:text-red-700 text-sm">Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <p class="text-gray-500 text-center">Aucun message reçu.</p>
+            {% endfor %}
+            
     </div>
+    
+    <div class="w-80 hidden lg:block p-4"></div>
 </div>
 {% endblock %}
