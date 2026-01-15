@@ -1,0 +1,16 @@
+<turbo-stream action="prepend" target="posts-list">
+    <template>
+        {% include 'home/_post.html.twig' with {post: post} %}
+    </template>
+</turbo-stream>
+
+<turbo-stream action="remove" target="no-posts">
+</turbo-stream>
+
+<turbo-stream action="update" target="post-creation-form">
+    <template>
+        {# On pourrait réinitialiser le formulaire ici, ou juste le textarea #}
+        {# Pour simplifier, on s'attend à ce que le contrôleur gère ça ou on utilise stimulus #}
+        {# Mais comme on ne touche pas au contrôleur, ce fichier sert de modèle "prêt à l'emploi" #}
+    </template>
+</turbo-stream>

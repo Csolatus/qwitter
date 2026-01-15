@@ -7,13 +7,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-class HomeController extends AbstractController
+class SecurityController extends AbstractController
 {
-    #[Route('/', name: 'home')]
-    public function index(AuthenticationUtils $authenticationUtils): Response
+    #[Route('/login', name: 'app_login')]
+    public function login(AuthenticationUtils $authenticationUtils): Response
     {
         if ($this->getUser()) {
-            return $this->render('home/feed.html.twig');
+            return $this->redirectToRoute('app_accueil');
         }
 
         // get the login error if there is one
@@ -21,7 +21,7 @@ class HomeController extends AbstractController
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
-        return $this->render('home/index.html.twig', [
+        return $this->render('security/login.html.twig', [
             'last_username' => $lastUsername,
             'error' => $error,
         ]);
