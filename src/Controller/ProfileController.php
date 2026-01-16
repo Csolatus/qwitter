@@ -18,7 +18,7 @@ class ProfileController extends AbstractController
         if (!$slug) {
             $user = $this->getUser();
             if (!$user) {
-                return $this->redirectToRoute('home');
+                return $this->redirectToRoute('app_login');
             }
             /** @var User $user */
             // Idéalement on utiliserait le slug de l'utilisateur, 

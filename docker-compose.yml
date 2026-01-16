@@ -11,6 +11,7 @@ services:
       - ./templates:/var/www/html/templates
       - ./config:/var/www/html/config
       - ./migrations:/var/www/html/migrations
+      - ./.env:/var/www/html/.env
     depends_on:
       - db
     environment:

@@ -32,7 +32,7 @@ class SettingsController extends AbstractController
         $utilisateur = $this->getUser();
 
         if (!$utilisateur) {
-            return $this->redirectToRoute('home');
+            return $this->redirectToRoute('app_login');
         }
 
         // Récupération de l'onglet actif (par défaut 'account')
