@@ -23,6 +23,7 @@
                 <a href="{{ path('app_parametres', {tab: 'privacy'}) }}" class="pb-3 border-b-2 {{ onglet_actif == 'privacy' ? 'border-slate-800 text-slate-800 font-semibold' : 'border-transparent text-gray-400 hover:text-gray-600 font-medium' }} px-2 transition-colors">Confidentialité</a>
                 <a href="{{ path('app_parametres', {tab: 'security'}) }}" class="pb-3 border-b-2 {{ onglet_actif == 'security' ? 'border-slate-800 text-slate-800 font-semibold' : 'border-transparent text-gray-400 hover:text-gray-600 font-medium' }} px-2 transition-colors">Sécurité</a>
                 <a href="{{ path('app_parametres', {tab: 'billing'}) }}" class="pb-3 border-b-2 {{ onglet_actif == 'billing' ? 'border-slate-800 text-slate-800 font-semibold' : 'border-transparent text-gray-400 hover:text-gray-600 font-medium' }} px-2 transition-colors">Facturation</a>
+                <a href="{{ path('app_parametres', {tab: 'advanced'}) }}" class="pb-3 border-b-2 {{ onglet_actif == 'advanced' ? 'border-red-600 text-red-600 font-semibold' : 'border-transparent text-gray-400 hover:text-red-600 font-medium' }} px-2 transition-colors">Avancés</a>
             </div>
         </header>
 
@@ -261,6 +262,35 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+        {% elseif onglet_actif == 'advanced' %}
+            <div class="bg-white rounded-2xl border border-red-100 shadow-sm p-8">
+                <h3 class="text-lg font-bold text-red-600 border-b border-gray-100 pb-4 mb-6">Zone de Danger</h3>
+                
+                <div class="space-y-6">
+                    <p class="text-gray-600">
+                        La suppression de votre compte est irréversible. Toutes vos données (posts, messages, abonnements) seront définitivement effacées.
+                    </p>
+
+                    <div class="bg-red-50 border border-red-100 rounded-xl p-6">
+                        {{ form_start(deleteForm, {'attr': {'class': 'space-y-4'}}) }}
+                            <div class="block text-sm font-medium text-red-800 mb-1">Confirmation du mot de passe</div>
+                            {{ form_widget(deleteForm.password, {'attr': {'class': 'w-full px-4 py-3 rounded-xl border border-red-200 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition-all', 'placeholder': 'Votre mot de passe actuel'}}) }}
+                            {{ form_errors(deleteForm.password, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+
+                            <div class="flex items-center gap-2 mt-4">
+                                {{ form_widget(deleteForm.confirm, {'attr': {'class': 'w-4 h-4 text-red-600 rounded border-red-300 focus:ring-red-500'}}) }}
+                                {{ form_label(deleteForm.confirm, null, {'label_attr': {'class': 'text-sm text-red-800 font-medium'}}) }}
+                            </div>
+                            {{ form_errors(deleteForm.confirm, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+
+                            <button type="submit" class="w-full mt-4 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-lg shadow-red-200">
+                                Supprimer mon compte définitivement
+                            </button>
+                        {{ form_end(deleteForm) }}
                     </div>
                 </div>
             </div>

@@ -9,12 +9,21 @@
 {% set size = size|default('w-10 h-10') %}
 {% set extra_classes = class|default('') %}
 
-<div class="{{ size }} rounded-full bg-slate-200 flex-shrink-0 overflow-hidden {{ extra_classes }}">
+{% set colors = [
+    'bg-red-500', 'bg-orange-500', 'bg-amber-500', 'bg-yellow-500', 
+    'bg-lime-500', 'bg-green-500', 'bg-emerald-500', 'bg-teal-500', 
+    'bg-cyan-500', 'bg-sky-500', 'bg-blue-500', 'bg-indigo-500', 
+    'bg-violet-500', 'bg-purple-500', 'bg-fuchsia-500', 'bg-pink-500', 'bg-rose-500'
+] %}
+{% set colorIndex = (user ? user.id : 0) % colors|length %}
+{% set bgColor = colors[colorIndex] %}
+
+<div class="{{ size }} rounded-full {{ user and user.avatar ? 'bg-slate-200' : bgColor }} flex-shrink-0 overflow-hidden flex items-center justify-center text-white font-bold {{ extra_classes }}">
     {% if user and user.avatar %}
         <img src="{{ asset('uploads/avatars/' ~ user.avatar) }}" alt="{{ user.pseudo }}" class="w-full h-full object-cover">
     {% elseif user %}
-        {# Fallback: UI Avatars Service #}
-        <img src="https://ui-avatars.com/api/?name={{ user.pseudo }}&background=0f172a&color=fff" alt="{{ user.pseudo }}" class="w-full h-full object-cover">
+        {# Initials Avatar with Random Color #}
+        <span class="text-sm">{{ user.pseudo|first|upper }}</span>
     {% else %}
         {# Fallback: Anonymous/Deleted User #}
         <div class="w-full h-full bg-slate-400 flex items-center justify-center text-white">

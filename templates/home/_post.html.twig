@@ -1,9 +1,7 @@
 <article class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer">
     <div class="flex gap-4">
         <div class="flex-shrink-0">
-            <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-lg">
-                {{ post.author.pseudo|first|upper }}
-            </div>
+            {% include 'partials/_avatar.html.twig' with {'user': post.author, 'size': 'w-12 h-12', 'class': 'text-lg'} %}
         </div>
         <div class="flex-grow space-y-2">
             <div class="flex items-center gap-2">
