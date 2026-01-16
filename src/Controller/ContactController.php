@@ -33,7 +33,7 @@ class ContactController extends AbstractController
             try {
                 $mailer->send($email);
                 $this->addFlash('success', 'Votre message a bien été envoyé !');
-                return $this->redirectToRoute('app_contact');
+                return $this->redirectToRoute('app_contact', [], Response::HTTP_SEE_OTHER);
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Une erreur est survenue lors de l\'envoi.');
             }
@@ -41,6 +41,6 @@ class ContactController extends AbstractController
 
         return $this->render('contact/index.html.twig', [
             'contactForm' => $form->createView(),
-        ]);
+        ], new Response(null, $form->isSubmitted() ? Response::HTTP_UNPROCESSABLE_ENTITY : Response::HTTP_OK));
     }
 }
