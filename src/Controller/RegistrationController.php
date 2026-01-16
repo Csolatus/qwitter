@@ -12,9 +12,12 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class RegistrationController extends AbstractController
 {
-    #[Route('/register', name: 'app_register', methods: ['POST'])]
+    #[Route('/register', name: 'app_register', methods: ['GET', 'POST'])]
     public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager, \Symfony\Bundle\SecurityBundle\Security $security): Response
     {
+        if ($request->isMethod('GET')) {
+            return $this->redirectToRoute('app_login', ['register' => 'true']);
+        }
         $user = new User();
         $email = $request->request->get('email');
         $plainPassword = $request->request->get('password');
