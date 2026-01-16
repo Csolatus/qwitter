@@ -90,10 +90,73 @@ class SettingsController extends AbstractController
             return $this->redirectToRoute('app_parametres', ['tab' => $onglet]);
         }
 
+        // Formulaire de suppression de compte (uniquement pour l'onglet advanced)
+        $deleteForm = null;
+        if ($onglet === 'advanced') {
+            $deleteForm = $this->createForm(\App\Form\DeleteAccountType::class, null, [
+                'action' => $this->generateUrl('app_account_delete'),
+                'method' => 'POST',
+            ]);
+        }
+
         // Rendu de la vue avec le formulaire et l'onglet actif
         return $this->render('settings/index.html.twig', [
             'formulaire' => $formulaire->createView(),
             'onglet_actif' => $onglet,
+            'deleteForm' => $deleteForm ? $deleteForm->createView() : null,
         ]);
+    }
+
+    #[Route('/parametres/supprimer', name: 'app_account_delete', methods: ['POST'])]
+    public function deleteAccount(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        \Symfony\Bundle\SecurityBundle\Security $security,
+    ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $form = $this->createForm(\App\Form\DeleteAccountType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                // Re-fetch user to verify existence and ensure it is attached to the current EntityManager
+                $userToDelete = $entityManager->getRepository(\App\Entity\User::class)->find($user->getId());
+
+                if (!$userToDelete) {
+                    throw new \Exception('Utilisateur non trouvé en base de données.');
+                }
+
+                // Remove user
+                $entityManager->remove($userToDelete);
+                $entityManager->flush();
+
+                // Logout manually AFTER flush
+                $security->logout(false);
+
+                $this->addFlash('success', 'Votre compte a été supprimé definitivement.');
+                return $this->redirectToRoute('app_accueil');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors de la suppression du compte : ' . $e->getMessage());
+                return $this->redirectToRoute('app_parametres', ['tab' => 'advanced']);
+            }
+        } else {
+            $errors = [];
+            foreach ($form->getErrors(true, true) as $error) {
+                $errors[] = $error->getMessage();
+            }
+
+            if (!empty($errors)) {
+                $this->addFlash('error', 'Validation échouée : ' . implode(', ', $errors));
+            } else {
+                $this->addFlash('error', 'Impossible de supprimer le compte. Vérifiez votre mot de passe et la case à cocher.');
+            }
+        }
+
+        return $this->redirectToRoute('app_parametres', ['tab' => 'advanced']);
     }
 }
