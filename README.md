@@ -41,7 +41,7 @@ Suivez ces étapes pour installer et lancer le projet localement.
 2.  **Lancer les conteneurs Docker**
     Construisez et démarrez les services (PHP, PostgreSQL, pgAdmin) :
     ```bash
-    docker-compose up -d --build
+    docker compose up --build
     ```
     puis effectuer les 3 commandes suivantes pour les migrations
     ```bash
