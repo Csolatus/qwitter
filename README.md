@@ -49,4 +49,5 @@ Suivez ces étapes pour installer et lancer le projet localement.
     docker exec -t qwitter-php-1 php bin/console doctrine:migrations:migrate --no-interaction
     docker exec -t qwitter-php-1 php bin/console doctrine:fixtures:load --no-interaction
     ```
-   
+
+### Notes le cahier des charges se situe dans les fichiers sous le nom de "Cahier_des_charges.pdf"
