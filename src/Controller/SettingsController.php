@@ -20,6 +20,15 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class SettingsController extends AbstractController
 {
+    /**
+     * Gère la page des paramètres utilisateurs.
+     * Cette méthode affiche et traite différents formulaires selon l'onglet actif :
+     * - account : Informations générales (avatar, pseudo, email, bio)
+     * - privacy : Paramètres de confidentialité
+     * - security : Changement de mot de passe
+     * - billing : Facturation (interface uniquement)
+     * - advanced : Suppression de compte
+     */
     #[Route('/parametres', name: 'app_parametres')]
     public function index(
         Request $requete,
@@ -107,6 +116,10 @@ class SettingsController extends AbstractController
         ]);
     }
 
+    /**
+     * Gère la suppression définitive du compte utilisateur.
+     * Vérifie le mot de passe et la case de confirmation avant de supprimer l'entité User.
+     */
     #[Route('/parametres/supprimer', name: 'app_account_delete', methods: ['POST'])]
     public function deleteAccount(
         Request $request,
@@ -124,18 +137,18 @@ class SettingsController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                // Re-fetch user to verify existence and ensure it is attached to the current EntityManager
+                // Récupération de l'utilisateur pour s'assurer qu'il est attaché à l'EntityManager actuel
                 $userToDelete = $entityManager->getRepository(\App\Entity\User::class)->find($user->getId());
 
                 if (!$userToDelete) {
                     throw new \Exception('Utilisateur non trouvé en base de données.');
                 }
 
-                // Remove user
+                // Suppression de l'utilisateur
                 $entityManager->remove($userToDelete);
                 $entityManager->flush();
 
-                // Logout manually AFTER flush
+                // Déconnexion manuelle APRES le flush
                 $security->logout(false);
 
                 $this->addFlash('success', 'Votre compte a été supprimé definitivement.');

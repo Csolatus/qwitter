@@ -11,6 +11,11 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ProfileController extends AbstractController
 {
+    /**
+     * Affiche le profil d'un utilisateur.
+     * Si aucun slug n'est fourni, redirige vers le profil de l'utilisateur connecté.
+     * Gère également les onglets (posts, j'aime, réponses) et la confidentialité.
+     */
     #[Route('/profil/{slug}', name: 'app_profile', defaults: ['slug' => null])]
     public function index(?string $slug, EntityManagerInterface $entityManager, Request $request): Response
     {

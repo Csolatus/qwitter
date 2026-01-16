@@ -133,7 +133,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * A visual identifier that represents this user.
+     * Un identifiant visuel qui représente cet utilisateur.
      *
      * @see UserInterface
      */
@@ -145,7 +145,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
+        // garantit que chaque utilisateur a au moins ROLE_USER
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
@@ -175,7 +175,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
+        // Si vous stockez des données temporaires ou sensibles sur l'utilisateur, nettoyez-les ici
         // $this->plainPassword = null;
     }
 
@@ -287,18 +287,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * Determines if the user's content (posts, likes) can be viewed by the given viewer.
+     * Détermine si le contenu de l'utilisateur (posts, likes) peut être vu par le visiteur donné.
      */
     public function canBeViewedBy(?UserInterface $viewer): bool
     {
-        // Public profile: always visible
+        // Profil public : toujours visible
         if (!$this->isPrivate) {
             return true;
         }
 
-        // Private profile:
-        // 1. Viewer is the owner -> Visible
-        // 2. Viewer follows the owner -> Visible
+        // Profil privé :
+        // 1. Le visiteur est le propriétaire -> Visible
+        // 2. Le visiteur suit le propriétaire -> Visible
         if ($viewer && ($viewer === $this || $this->getFollowers()->contains($viewer))) {
             return true;
         }
@@ -345,7 +345,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removePost(Post $post): static
     {
         if ($this->posts->removeElement($post)) {
-            // set the owning side to null (unless already changed)
+            // définit le côté propriétaire à null (sauf si déjà changé)
             if ($post->getAuthor() === $this) {
                 $post->setAuthor(null);
             }
@@ -375,7 +375,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeComment(Comment $comment): static
     {
         if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
+            // définit le côté propriétaire à null (sauf si déjà changé)
             if ($comment->getAuthor() === $this) {
                 $comment->setAuthor(null);
             }
@@ -405,7 +405,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeLike(Like $like): static
     {
         if ($this->likes->removeElement($like)) {
-            // set the owning side to null (unless already changed)
+            // définit le côté propriétaire à null (sauf si déjà changé)
             if ($like->getUser() === $this) {
                 $like->setUser(null);
             }
@@ -504,7 +504,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeMessage(Message $message): static
     {
         if ($this->messages->removeElement($message)) {
-            // set the owning side to null (unless already changed)
+            // définit le côté propriétaire à null (sauf si déjà changé)
             if ($message->getSender() === $this) {
                 $message->setSender(null);
             }
@@ -534,7 +534,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeNotification(Notification $notification): static
     {
         if ($this->notifications->removeElement($notification)) {
-            // set the owning side to null (unless already changed)
+            // définit le côté propriétaire à null (sauf si déjà changé)
             if ($notification->getUser() === $this) {
                 $notification->setUser(null);
             }

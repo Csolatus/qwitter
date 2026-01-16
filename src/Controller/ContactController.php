@@ -12,6 +12,10 @@ use Symfony\Component\Mime\Email;
 
 class ContactController extends AbstractController
 {
+    /**
+     * Gère la page de contact et l'envoi du formulaire.
+     * Envoie un email à l'administrateur avec les données saisies par l'utilisateur.
+     */
     #[Route('/contact', name: 'app_contact')]
     public function index(Request $request, MailerInterface $mailer): Response
     {
@@ -22,7 +26,8 @@ class ContactController extends AbstractController
             $data = $form->getData();
 
             $email = (new Email())
-                ->from($data['email'])
+                ->from('no-reply@qwitter.com')
+                ->replyTo($data['email'])
                 ->to('contact@qwitter.com')
                 ->subject('Nouveau contact : ' . $data['subject'])
                 ->text(

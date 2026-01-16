@@ -19,21 +19,21 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $users = [];
-        // 1. Create specific users (Admin & Demo)
+        // 1. Création des utilisateurs spécifiques (Admin & Démo)
         $admin = $this->createUser($manager, 'admin@qwitter.com', 'AdminQwitter', ['ROLE_ADMIN']);
         $demo = $this->createUser($manager, 'demo@qwitter.com', 'DemoUser', ['ROLE_USER']);
         $users[] = $admin;
         $users[] = $demo;
 
-        // 2. Create 15 dummy users
+        // 2. Création de 15 utilisateurs fictifs
         for ($i = 1; $i <= 15; $i++) {
             $user = $this->createUser($manager, "user$i@qwitter.com", "User$i", ['ROLE_USER']);
             $users[] = $user;
         }
 
-        // 3. Create Posts for each user
+        // 3. Création de Posts pour chaque utilisateur
         foreach ($users as $user) {
-            // Each user posts between 0 and 5 times
+            // Chaque utilisateur publie entre 0 et 5 fois
             $nbPosts = mt_rand(0, 5);
             for ($j = 0; $j < $nbPosts; $j++) {
                 $post = new \App\Entity\Post();
@@ -44,16 +44,16 @@ class AppFixtures extends Fixture
             }
         }
 
-        // 4. Create Follows (Random)
+        // 4. Création des abonnements (Aléatoire)
         foreach ($users as $user) {
-            // follows 3 to 7 other users
+            // suit 3 à 7 autres utilisateurs
             $targets = $users;
             shuffle($targets);
             $nbFollows = mt_rand(3, 7);
 
             for ($k = 0; $k < $nbFollows; $k++) {
                 $target = $targets[$k];
-                if ($target !== $user) { // Don't follow self
+                if ($target !== $user) { // Ne pas se suivre soi-même
                     $user->addFollowing($target);
                 }
             }

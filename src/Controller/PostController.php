@@ -16,6 +16,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/post')]
 class PostController extends AbstractController
 {
+    /**
+     * Gère l'action de "Like" sur un post.
+     * Si le like existe déjà, il est supprimé (unlike). Sinon, il est créé.
+     */
     #[Route('/{id}/like', name: 'app_post_like', methods: ['POST', 'GET'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function like(Post $post, LikeRepository $likeRepo, EntityManagerInterface $entityManager, Request $request, NotificationService $notificationService): Response
@@ -37,27 +41,27 @@ class PostController extends AbstractController
 
         $entityManager->flush();
 
-        // If AJAX request, could return JSON. For now, redirect back.
-        // We look at the referer to redirect to the same page
+        // Récupère l'URL précédente pour rediriger l'utilisateur au même endroit
         $referer = $request->headers->get('referer');
         return $this->redirect($referer ?? $this->generateUrl('app_accueil'));
     }
 
+    /**
+     * Permet à un utilisateur de republier (repost) un message existant.
+     */
     #[Route('/{id}/repost', name: 'app_post_repost', methods: ['POST', 'GET'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function repost(Post $post, EntityManagerInterface $entityManager, Request $request, NotificationService $notificationService): Response
     {
         $user = $this->getUser();
 
-        // Check if already reposted? Logic might get complex, for now simple implementation
+        // Vérifie si déjà reposté? Logique simplifiée pour l'instant
         $repost = new Post();
         $repost->setAuthor($user);
-        $repost->setContent(''); // Repost content usually empty or copied? Let's say empty and we rely on originalPost
+        $repost->setContent(''); // contenu vide, on se base sur l'originalPost
         $repost->setOriginalPost($post);
-        // CreatedAt handled by constructor or lifecycle? Post doesn't have constructor for createdAt yet?
-        // Let's check Post entity... we verified 'createdAt' property exists but not if it's auto-set.
-        // User's previous error on Like suggests we need to set it manually if not in constructor.
-        // Let's safe-set it here.
+
+        // On définit la date de création manuellement
         $repost->setCreatedAt(new \DateTimeImmutable());
 
         $entityManager->persist($repost);
@@ -69,20 +73,24 @@ class PostController extends AbstractController
         return $this->redirect($referer ?? $this->generateUrl('app_accueil'));
     }
 
+    /**
+     * Affiche le détail d'un post spécifique.
+     */
     #[Route('/{id}', name: 'app_post_show', methods: ['GET'])]
     public function show(Post $post): Response
     {
-        // Fetch comments? Or rely on $post->getComments() (Lazy loading)
-        // Lazy loading is fine for now.
-        // We might want to sort comments? They are Collection, can do logic in template or separate query.
-        // Let's rely on default ordering or sort in Twig/Entity if needed. 
-        // We can pass them explicitly if we want to sort DESC.
+        // Les commentaires sont chargés via le lazy loading de Doctrine dans le template si besoin
 
         return $this->render('post/show.html.twig', [
             'post' => $post,
         ]);
     }
 
+    /**
+     * Supprime un post.
+     * Vérifie si l'utilisateur est l'auteur ou un administrateur.
+     * Supprime également l'image associée si elle existe.
+     */
     #[Route('/{id}/delete', name: 'app_post_delete', methods: ['POST'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
     public function delete(Post $post, EntityManagerInterface $entityManager, Request $request): Response
@@ -92,7 +100,7 @@ class PostController extends AbstractController
         }
 
         if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->request->get('_token'))) {
-            // Remove image if exists
+            // Suppression de l'image si elle existe
             if ($post->getImageFilename()) {
                 $imagePath = $this->getParameter('posts_directory') . '/' . $post->getImageFilename();
                 if (file_exists($imagePath)) {
