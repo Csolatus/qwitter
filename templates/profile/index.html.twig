@@ -32,7 +32,7 @@
                         {% else %}
                             <form action="{{ path('app_follow', {'id': user.id}) }}" method="post">
                                 <input type="hidden" name="_token" value="{{ csrf_token('follow' ~ user.id) }}">
-                                {% if app.user.isFollowing(user) %}
+                                {% if app.user and app.user.isFollowing(user) %}
                                     <button type="submit" class="group px-6 py-2 border border-gray-300 text-slate-900 font-semibold rounded-full hover:bg-red-50 hover:border-red-200 hover:text-red-600 transition-all">
                                         <span class="group-hover:hidden">Abonné</span>
                                         <span class="hidden group-hover:inline">Se désabonner</span>
