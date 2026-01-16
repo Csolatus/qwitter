@@ -196,7 +196,7 @@ class Post
     public function removeRepost(self $repost): self
     {
         if ($this->reposts->removeElement($repost)) {
-            // set the owning side to null (unless already changed)
+            // définit le côté propriétaire à null (sauf si déjà changé)
             if ($repost->getOriginalPost() === $this) {
                 $repost->setOriginalPost(null);
             }
@@ -226,7 +226,7 @@ class Post
     public function removeComment(Comment $comment): static
     {
         if ($this->comments->removeElement($comment)) {
-            // set the owning side to null (unless already changed)
+            // définit le côté propriétaire à null (sauf si déjà changé)
             if ($comment->getPost() === $this) {
                 $comment->setPost(null);
             }
@@ -262,7 +262,7 @@ class Post
     public function removeLike(Like $like): static
     {
         if ($this->likes->removeElement($like)) {
-            // set the owning side to null (unless already changed)
+            // définit le côté propriétaire à null (sauf si déjà changé)
             if ($like->getPost() === $this) {
                 $like->setPost(null);
             }
@@ -280,7 +280,7 @@ class Post
 
     public function setPoll(Poll $poll): static
     {
-        // set the owning side of the relation if necessary
+        // définit le côté propriétaire de la relation si nécessaire
         if ($poll->getPost() !== $this) {
             $poll->setPost($this);
         }

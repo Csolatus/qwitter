@@ -59,7 +59,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?bool $isPrivate = false;
 
     #[ORM\Column(length: 20, options: ['default' => 'everyone'])]
-    private ?string $messagePrivacy = 'everyone'; // everyone, followers, nobody
+    private ?string $messagePrivacy = 'everyone'; // tout le monde, abonnés, personne
 
 
 

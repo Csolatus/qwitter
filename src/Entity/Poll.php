@@ -112,7 +112,7 @@ class Poll
     public function removeOption(PollOption $option): static
     {
         if ($this->options->removeElement($option)) {
-            // set the owning side to null (unless already changed)
+            // définit le côté propriétaire à null (sauf si déjà changé)
             if ($option->getPoll() === $this) {
                 $option->setPoll(null);
             }

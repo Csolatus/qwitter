@@ -133,11 +133,11 @@ class AccueilController extends AbstractController
                     $suggestions[] = $potentialUser;
                 }
             }
-            // Shuffle and take 3
+            // Mélanger et en prendre 3
             shuffle($suggestions);
             $suggestions = array_slice($suggestions, 0, 10);
         } else {
-            // Si pas connecté, suggestions aléatoires simples
+            // Si pas connecté, suggestions aléatoires simples (les 10 derniers inscrits)
             $suggestions = $userRepo->findBy([], ['created_at' => 'DESC'], 10);
         }
 
